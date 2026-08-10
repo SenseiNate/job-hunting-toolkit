@@ -1,4 +1,4 @@
-# Job Search Toolkit
+# Job Hunting Toolkit
 
 Two Claude Projects that run your job search end to end, both built on the same hard rule: **the
 AI can only ever use accomplishments you actually wrote down.** No fabricated skills, no invented

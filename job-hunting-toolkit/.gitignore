@@ -1,0 +1,9 @@
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Personal, filled-in copies — keep templates in the repo, not your real data
+*_Manifesto.md
+*_Data_Bank.md
+*_DATA_BANK.md
