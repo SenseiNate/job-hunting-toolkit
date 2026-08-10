@@ -1,0 +1,163 @@
+================================================================================
+[YOUR NAME] - MASTER SKILLS & ACCOMPLISHMENTS TRACKER
+Complete reference for all professional competencies and achievements
+================================================================================
+
+HOW TO USE THIS FILE
+--------------------------------------------------------------------------------
+STANDALONE USERS ONLY: if you're also using the companion resume scanner &
+builder project (see /01-resume-scanner-builder in this repo), skip this file
+entirely and upload your filled-in DATA_BANK_TEMPLATE.md from that project
+here instead. It covers the same ground with a track/accomplishment-ID system
+the interview prep builder already knows how to read. Don't maintain two
+separate data banks; that's how they drift out of sync with each other.
+
+This is the single source of truth Claude pulls from when building interview
+prep cards. The rule that governs everything downstream: if a claim is not in
+this file, it does not go on a resume or into a prep card. No inflation, no
+fabrication.
+
+Fill in every bracketed section with your own real accomplishments, real
+numbers, and real tools. Delete any section that doesn't apply to your field
+(e.g. the Sector Translation Table only matters if you move between a
+regulated/defense/government context and a commercial one). Leave a section
+blank rather than filling it with something you can't defend in a live
+conversation.
+
+Rename this file to [YOUR_NAME]_MASTER_DATA_BANK.txt before uploading it to
+your Claude Project.
+================================================================================
+
+
+================================================================================
+SECTOR TRANSLATION TABLE (OPTIONAL)
+================================================================================
+> CUSTOMIZE OR DELETE: Only fill this in if you move between two worlds that
+> use different vocabulary for the same underlying work — e.g. defense vs.
+> commercial, healthcare vs. general enterprise, academic vs. industry. Each
+> row maps a term from one world to its plain-language equivalent in the
+> other, so Claude can automatically translate accomplishment bullets when
+> building for a role in the other world.
+
+[Domain-specific term]           ->  [Plain-language / other-domain equivalent]
+[Domain-specific term]           ->  [Plain-language / other-domain equivalent]
+
+
+================================================================================
+PART 1: MASTER SKILLS & TOOLS FRAMEWORK
+================================================================================
+
+--------------------------------------------------------------------------------
+SOFT SKILLS
+--------------------------------------------------------------------------------
+> List the soft skills you can actually back up with a story if asked. A long
+> list is fine — this is a reference library, not something that all appears
+> on one resume — but every entry should be something you could talk through
+> for two minutes if pressed.
+
+* [Skill]
+* [Skill]
+
+
+--------------------------------------------------------------------------------
+HARD SKILLS
+--------------------------------------------------------------------------------
+> Group these however makes sense for your field. The categories below are
+> examples — rename, merge, split, or delete them to match your actual work.
+> The goal is a list specific enough that Claude can match JD language to a
+> real skill you hold, not generic buzzwords.
+
+[CATEGORY 1 — e.g. "CORE TECHNICAL SKILLS"]
+* [Skill / method / framework]
+* [Skill / method / framework]
+
+[CATEGORY 2 — e.g. "PROJECT / PROGRAM MANAGEMENT"]
+* [Skill]
+
+[CATEGORY 3 — e.g. "COMPLIANCE & GOVERNANCE"]
+* [Skill / standard / regulation you've actually worked under]
+
+[CATEGORY 4 — e.g. "TOOLS & PLATFORMS"]
+* [Named tool you have real hands-on time in]
+
+> If you have any skills that are personal-project-only (side projects, self-
+> taught tools, things you can speak to in a cover letter but not claim as
+> professional experience on a resume), flag them clearly like this:
+
+[CATEGORY — PERSONAL PROJECT KNOWLEDGE, NOT PROFESSIONAL EXPERIENCE]
+> Note: flag explicitly which of these can/can't go on a resume vs. only be
+> discussed in a cover letter or interview as "things I do on the side."
+* [Skill]
+
+
+================================================================================
+PART 2: ACCOMPLISHMENTS BY COMPANY
+================================================================================
+> Write each accomplishment as a real Task/Problem -> Action -> Outcome
+> statement. If it can't survive that three-part test, rewrite it or leave it
+> out — don't put an unverifiable bullet in here just to fill space.
+>
+> OPTIONAL: TRACK SYSTEM. If you routinely apply to more than one type of
+> role (e.g. individual contributor vs. people manager, or technical vs.
+> program-management framing of the same work), you can write each
+> accomplishment in multiple "tracks" — the same underlying fact, reframed
+> for a different resume angle. This is optional. If you only ever target one
+> type of role, skip the track system and just write each accomplishment
+> once, plainly.
+>
+> IMPORTANT: Never mix tracks/framings within a single bullet. Every version
+> of a bullet must still be defensible as the same real thing that happened.
+
+--------------------------------------------------------------------------------
+[COMPANY NAME] ([START DATE] - [END DATE]) -- [N] Accomplishments
+--------------------------------------------------------------------------------
+
+---[TRACK 1 NAME, e.g. "INDIVIDUAL CONTRIBUTOR" — OR DELETE IF NOT USING TRACKS]---
+
+* [CODE-1]: [Accomplishment. Task/problem, action, measurable outcome.]
+
+* [CODE-2]: [Accomplishment.]
+
+---[TRACK 2 NAME — OPTIONAL]---
+
+* [CODE-1]: [Same real event, reframed for a different resume angle.]
+
+
+--------------------------------------------------------------------------------
+[NEXT COMPANY NAME] ([START DATE] - [END DATE])
+--------------------------------------------------------------------------------
+[Repeat the structure above for every employer you want available for resume
+and interview-prep matching. Most recent employer first is easiest to work
+with, but it's not required.]
+
+
+================================================================================
+AWARDS AND RECOGNITION
+================================================================================
+> Reference material only — these typically don't go directly on a resume as
+> line items, but Claude can cross-reference them when a JD or a story calls
+> for third-party validation of your work.
+
+[Award Name] -- [Date]
+Issued by: [Who]
+
+[One paragraph: what the award recognized, in enough detail that Claude could
+build a STAR story around it if a question calls for it.]
+
+
+================================================================================
+HOW TO USE THIS TRACKER
+================================================================================
+1. Track selection (if using tracks): match the JD's primary function to the
+   track that fits best.
+2. Sector translation (if using the table above): apply it automatically when
+   building for a role in the other domain.
+3. Metrics validation: pull metrics directly from the accomplishment entries
+   in this file — scan for the most relevant figures for the target JD.
+4. Interview prep: every bullet must be defensible in a live conversation —
+   no inflation, no fabrication.
+5. Audit rule: if a bullet cannot be verified against this file, it does not
+   go on the resume or into a prep card.
+================================================================================
+END OF MASTER SKILLS & ACCOMPLISHMENTS TRACKER
+================================================================================

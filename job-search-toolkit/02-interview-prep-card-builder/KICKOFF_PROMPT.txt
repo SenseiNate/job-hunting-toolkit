@@ -1,0 +1,40 @@
+════════════════════════════════════════════════════════════════════════════
+STARTING A NEW ROLE (first interview round)
+════════════════════════════════════════════════════════════════════════════
+
+Before sending this message, in the same chat, attach/paste:
+  1. The job description (full text, not just a link)
+  2. The resume you actually submitted for this specific role
+  3. Any recruiter or hiring-manager email content you already have (optional)
+
+Then send exactly this, filled in:
+
+--------------------------------------------------------------------------------
+Build me a Round 1 prep card for [Company], [Role Title].
+--------------------------------------------------------------------------------
+
+
+════════════════════════════════════════════════════════════════════════════
+AFTER AN INTERVIEW ROUND HAPPENS
+════════════════════════════════════════════════════════════════════════════
+
+First, in plain language, tell Claude:
+  - What was actually asked (as close to verbatim as you can recall)
+  - What landed well and what didn't
+  - Any new intel: interviewer names/titles, process details, timeline,
+    next-round format
+
+Then send exactly this, filled in:
+
+--------------------------------------------------------------------------------
+Update the card for Round [N] with [interviewer name(s)].
+--------------------------------------------------------------------------------
+
+
+════════════════════════════════════════════════════════════════════════════
+IF THE NEXT ROUND IS A MULTI-PERSON ONSITE / PANEL DAY
+════════════════════════════════════════════════════════════════════════════
+
+Include the schedule (who you're meeting, in what order, and for how long) when
+you send the update message above. Claude will add a Study tab to the card and
+build a separate one-page markdown memorization sheet for the night before.
