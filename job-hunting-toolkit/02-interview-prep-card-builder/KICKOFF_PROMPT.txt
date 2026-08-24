@@ -23,6 +23,10 @@ First, in plain language, tell Claude:
   - What landed well and what didn't
   - Any new intel: interviewer names/titles, process details, timeline,
     next-round format
+  - Anything unusual about the round format (case study, live coding,
+    whiteboard system design, work-sample walkthrough) that might call for a
+    round-specific extra — see README.md's Chat-Specific Extras section.
+    Extras built for one round apply only to that round's card.
 
 Then send exactly this, filled in:
 
