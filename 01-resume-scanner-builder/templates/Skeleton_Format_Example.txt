@@ -1,0 +1,93 @@
+**EXAMPLE SKELETON FORMAT -- STRUCTURE AND FORMATTING REFERENCE ONLY. DO NOT USE THIS TEXT AS RESUME CONTENT. CONTENT ALWAYS COMES FROM YOUR DATA BANK PER THE MANIFESTO. THIS IS THE "DIAMOND" FORMATTING STANDARD.**
+
+**[YOUR FULL NAME]**
+
+[Phone] | [Email] | [LinkedIn URL] | [Portfolio/GitHub URL, optional] | [Clearance or credential headline, if applicable]
+
+**PROFESSIONAL SUMMARY**
+
+[No title, headline, or label opens the summary, per Manifesto Section 3D. Begin directly with the capability-statement hook per the Instant-Value Identity Thread, anchored to company mission and JD problem], evidenced across [N]+ years [of relevant scope]. [Metric 1 placeholder] and [Metric 2 placeholder]. [Cross-functional and technical depth placeholder sentence].
+
+**AREAS OF EXPERTISE**
+
+**[Category 1]: **[Keyword], [Keyword], [Keyword], [Keyword]
+
+**[Category 2]: **[Keyword], [Keyword], [Keyword], [Keyword]
+
+**[Category 3]: **[Keyword], [Keyword], [Keyword], [Keyword]
+
+**[Category 4]: **[Keyword], [Keyword], [Keyword], [Keyword]
+
+**PROFESSIONAL EXPERIENCE**
+
+**[EMPLOYER 1]**
+
+	[Title], [Employment Type]	[Start Date] - [End Date / Present]
+
+- [Outcome-first bullet 1 of 5 -- strongest, most relevant Data Bank entry for this JD, per Manifesto Section 3I]
+
+- [Outcome-first bullet 2 of 5 -- pulled from matching Data Bank track]
+
+- [Outcome-first bullet 3 of 5 -- pulled from matching Data Bank track]
+
+- [Outcome-first bullet 4 of 5 -- pulled from matching Data Bank track]
+
+- [Outcome-first bullet 5 of 5 -- pulled from matching Data Bank track]
+
+**[EMPLOYER 2]**
+
+	[Title], [Employment Type]	[Start Date] - [End Date]
+
+- [Outcome-first bullet 1 of 4 -- strongest, most relevant Data Bank entry for this JD]
+
+- [Outcome-first bullet 2 of 4 -- pulled from matching Data Bank track]
+
+- [Outcome-first bullet 3 of 4 -- pulled from matching Data Bank track]
+
+- [Outcome-first bullet 4 of 4 -- pulled from matching Data Bank track]
+
+**[EMPLOYER 3]**
+
+	[Title], [Employment Type]	[Start Date] - [End Date]
+
+- [Outcome-first bullet 1 of 4 -- strongest, most relevant Data Bank entry for this JD]
+
+- [Outcome-first bullet 2 of 4 -- pulled from matching Data Bank track]
+
+- [Outcome-first bullet 3 of 4 -- pulled from matching Data Bank track]
+
+- [Outcome-first bullet 4 of 4 -- pulled from matching Data Bank track]
+
+**[EMPLOYER 4]**
+
+	[Title], [Employment Type]	[Start Date] - [End Date]
+
+- [Outcome-first bullet 1 of 3 -- strongest, most relevant Data Bank entry for this JD]
+
+- [Outcome-first bullet 2 of 3 -- pulled from matching Data Bank track]
+
+- [Outcome-first bullet 3 of 3 -- pulled from matching Data Bank track]
+
+**CERTIFICATIONS AND CLEARANCE**
+
+	**[Certification / Clearance Name]**	[Status or expiration]
+
+[Issuing body]
+
+	**[Certification / License Name]**	[Status or expiration]
+
+[Issuing body]
+
+**EDUCATION**
+
+	**[Degree Name]**	[Status, e.g. In Progress / completion year]
+
+[School, City, State]
+
+	**[Degree Name]**	[Completion year]
+
+[School, City, State]
+
+	**[Degree Name]**	[Completion year]
+
+[School, City, State]

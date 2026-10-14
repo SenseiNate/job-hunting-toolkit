@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[COMPANY] | [ROLE] | [YOUR NAME]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── CHANGE THESE 4 VALUES TO COMPANY BRAND COLOR ──────────────────
+     Find the company's primary hex color. Example values:
+     RTX/Collins:  #1a5ea8 / #4d8fd4 / rgba(26,94,168,0.3)
+     Lockheed:     #1f5ca8 / #4a8fd4 / rgba(31,92,168,0.3)
+     Raytheon:     #e8001d / #ff4d5e / rgba(232,0,29,0.3)
+     BAE Systems:  #e4002b / #ff5c74 / rgba(228,0,43,0.32)
+     Amazon:       #ff9900 / #ffb84d / rgba(255,153,0,0.3)
+     Anduril:      #1afe49 / #60ff8a / rgba(26,254,73,0.3)
+     Palantir:     #7b68ee / #9d8fff / rgba(123,104,238,0.3)
+     Research the current brand color at build time if not listed. */
+  :root {
+    --bg: #09090f;
+    --card: #111118;
+    --card-2: #16161f;
+    --accent: #6c63ff;                      /* CHANGE */
+    --accent-2: #9d96ff;                    /* CHANGE: lighter */
+    --accent-glow: rgba(108,99,255,0.15);   /* CHANGE: accent at 0.15 alpha */
+    --border-accent: rgba(108,99,255,0.3);  /* CHANGE: accent at 0.3 alpha */
+    --text: #e8e8f0;
+    --dim: #a0a0b8;
+    --gold: #ffc857;
+    --gold-dim: rgba(255,200,87,0.15);
+    --success: #3ecf8e;
+    --danger: #ff6b6b;
+    --border: rgba(255,255,255,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.65; padding-bottom: 120px; }
+
+  /* HEADER — one line, plain. No badge row, no Study Mode toggle.
+     Everything that used to live in badges (date, interviewer, comp,
+     remote/onsite) now lives in the Essentials Strip inside Overview. */
+  .site-header { background: linear-gradient(135deg,#08080f 0%,#0d1420 100%); border-bottom: 1px solid var(--border-accent); padding: 12px 16px; position: sticky; top: 0; z-index: 100; }
+  .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .header-left h1 { font-family: 'Bebas Neue', sans-serif; font-size: 1.55rem; letter-spacing: 2px; line-height: 1; }
+  .header-left h1 span { color: var(--accent-2); }
+  .header-left .subtitle { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--dim); letter-spacing: 0.3px; margin-top: 3px; }
+
+  /* TAB NAV — offsets are set at runtime by setOffsets() so sticky
+     layers stack correctly regardless of how tall the header gets.
+     Seven tabs, in order: Overview, Resume Stories [omit if no resume
+     was submitted], JD Question Stories, Extra Stories, Technical
+     Knowledge, Values [optional slot], Intel. */
+  .tab-nav { position: sticky; top: var(--hdr,70px); z-index: 90; background: #0a0c14; border-bottom: 1px solid var(--border-accent); display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-btn { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--dim); padding: 0 20px; height: 44px; display: flex; align-items: center; gap: 6px; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; user-select: none; flex-shrink: 0; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent-2); border-bottom-color: var(--accent); }
+  .subtab-nav { background: #0b0d18; border-bottom: 1px solid var(--border); display: none; overflow-x: auto; scrollbar-width: none; padding: 0 16px; position: sticky; top: var(--nav,114px); z-index: 85; }
+  .subtab-nav.visible { display: flex; }
+  .subtab-btn { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); padding: 0 14px; height: 34px; display: flex; align-items: center; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; user-select: none; flex-shrink: 0; }
+  .subtab-btn:hover { color: var(--text); }
+  .subtab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab-panel, .subtab-panel { display: none; }
+  .tab-panel.active, .subtab-panel.active { display: block; }
+
+  /* MAIN */
+  .main { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
+
+  /* SECTIONS — used for company groups (Resume Stories), question-type
+     groups (JD Question Stories, Extra Stories, Technical Knowledge), and one-off wrapper
+     sections (Behavioral-era carryover, Intel). */
+  .section-block { margin-bottom: 10px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; scroll-margin-top: calc(var(--sub,148px) + 10px); }
+  .section-block.open { border-color: var(--border-accent); }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 14px 18px; cursor: pointer; background: var(--card); user-select: none; }
+  .section-header:hover { background: var(--card-2); }
+  .section-num { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent-2); letter-spacing: 1px; min-width: 28px; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 1.5px; color: var(--text); flex: 1; }
+  .section-chevron { color: var(--dim); font-size: 0.8rem; transition: transform 0.25s; }
+  .section-block.open .section-chevron { transform: rotate(180deg); }
+  .section-body { display: none; padding: 0 18px 18px; background: var(--card); border-top: 1px solid var(--border); }
+  .section-block.open .section-body { display: block; }
+  .section-intro { padding-top: 12px; font-size: 0.85rem; color: var(--dim); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 4px; }
+
+  /* GROUP TITLE/QUOTE — used inside Technical Knowledge and Extra Stories
+     groups to show the JD phrase or focus-area theme a group answers.
+     Same visual role the old jd-group played inside Role-Based. */
+  .grp { margin-top: 22px; scroll-margin-top: calc(var(--sub,148px) + 10px); }
+  .grp-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 1.2px; color: var(--accent-2); }
+  .grp-quote { font-size: 0.8rem; color: var(--dim); font-style: italic; border-left: 2px solid var(--border-accent); padding-left: 10px; margin: 3px 0 4px; }
+  .toc { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 12px 0 10px; border-bottom: 1px solid var(--border); }
+  .toc-link { font-size: 0.8rem; color: var(--accent-2); cursor: pointer; }
+  .toc-link:hover { text-decoration: underline; }
+  .toc-link.dim { color: var(--dim); }
+
+  /* RESUME BULLET — Resume Stories tab only. The exact submitted
+     bullet, quoted word for word, in a gold box directly above the
+     story block that defends it. Group more than one resume-bullet
+     above a single story block when they share it (Rule: every
+     bullet gets a primary story; promote shared-only coverage). */
+  .resume-bullet-group { margin-top: 20px; }
+  .resume-bullet { background: var(--gold-dim); border: 1px solid rgba(255,200,87,0.35); border-left: 3px solid var(--gold); border-radius: 6px; padding: 10px 14px; font-size: 0.85rem; font-style: italic; color: var(--gold); margin-bottom: 6px; }
+  /* JD QUESTION STORIES — the JD line, quoted word for word with a
+     Required/Preferred tag, directly above the block that answers it. */
+  .jd-req { background: rgba(157,150,255,0.08); border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-2); border-radius: 6px; padding: 10px 14px; font-size: 0.85rem; font-style: italic; color: var(--text); margin-bottom: 6px; }
+  .jd-tag { display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.58rem; font-style: normal; letter-spacing: 0.8px; text-transform: uppercase; padding: 1px 7px; border-radius: 3px; margin-right: 8px; vertical-align: middle; }
+  .jd-tag.required { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(255,200,87,0.4); }
+  .jd-tag.preferred { background: rgba(157,150,255,0.12); color: var(--accent-2); border: 1px solid var(--border-accent); }
+  .jd-tag.resp { background: rgba(255,255,255,0.04); color: var(--dim); border: 1px solid var(--border); }
+
+  /* CULTURE FIT NOTE — one line per story block, coaching only, never
+     said out loud. Names the real, documented company value or culture
+     signal the story shows through what happened (README: Culture fit
+     on every story). Omit when no honest signal fits. */
+  .culture-note { font-size: 0.78rem; line-height: 1.5; padding: 6px 10px; border-radius: 6px; margin-bottom: 6px; background: rgba(62,207,142,0.07); color: var(--success); border-left: 3px solid var(--success); }
+
+  /* Q-BLOCKS — shared shell for both Block Anatomy types:
+     Story block  (STAR, story-head "Main story"/"Alternate story",
+                   same-story flag, deeper dive, follow-ups, alt toggle)
+     Knowledge block (Direct answer, deeper dive, follow-ups; no STAR,
+                   story-head reads "Direct answer" or "Knowledge").
+     Both use .q-block/.q-header/.q-body so nav, search, one-block-open
+     enforcement, and styling all work identically. */
+  .q-block { border: 1px solid var(--border); border-radius: 8px; margin-top: 10px; overflow: hidden; scroll-margin-top: calc(var(--sub,148px) + 10px); }
+  .q-block.open { border-color: var(--border-accent); }
+  .q-header { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; cursor: pointer; background: var(--card-2); user-select: none; }
+  .q-header:hover { background: #1c1a24; }
+  .q-num { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--accent-2); min-width: 28px; padding-top: 2px; }
+  .q-header-text { flex: 1; }
+  .q-title-text { font-weight: 500; font-size: 0.92rem; line-height: 1.4; }
+  .q-chevron { color: var(--dim); font-size: 0.75rem; padding-top: 3px; transition: transform 0.2s; }
+  .q-block.open .q-chevron { transform: rotate(180deg); }
+  .q-body { display: none; padding: 14px 16px 16px; background: var(--card-2); border-top: 1px solid var(--border); }
+  .q-block.open .q-body { display: block; }
+
+  /* MEMORY-HOOK CUE — always visible under every q-title, no toggle.
+     One mode: the card is always scannable without opening a block. */
+  .study-cue { display: block; font-family: 'DM Mono', monospace; font-size: 0.74rem; color: var(--gold); margin-top: 4px; line-height: 1.5; }
+
+  /* BADGES — gold note (focus/tip) and red note (confirm before using),
+     shown in the q-header next to the title per Block Anatomy part 2. */
+  .q-badge { display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.6px; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+  .q-badge.gold { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(255,200,87,0.4); }
+  .q-badge.red { background: rgba(255,107,107,0.1); color: #ff9f9f; border: 1px solid rgba(255,107,107,0.35); }
+
+  /* STAR LABELS, STORY HEAD, NOTES */
+  .star-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent-2); margin-bottom: 2px; margin-top: 12px; }
+  .prose { font-size: 0.9rem; line-height: 1.7; }
+  .prose p { margin-bottom: 9px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--accent-2); font-weight: 600; }
+  .prose em { color: var(--gold); font-style: normal; font-weight: 500; }
+  .prose ul { padding-left: 16px; margin-bottom: 9px; }
+  .prose li { margin-bottom: 4px; }
+  .story-source { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--dim); margin-top: 10px; }
+
+  /* story-head: "Main story · Company" / "Alternate story · Company" /
+     "Direct answer" / "Knowledge" / "Gap answer" — one line. */
+  .story-head { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin: 10px 0 2px; padding-bottom: 6px; border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); }
+
+  /* SAME-STORY FLAG — Block Anatomy, Story block part 5. Shown instead
+     of a full retelling when one real event already answers another
+     question elsewhere on the card. Always a working jump link, never
+     a dead reference. */
+  .same-story-flag { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--accent-2); background: rgba(157,150,255,0.07); border: 1px dashed var(--border-accent); border-radius: 6px; padding: 9px 12px; margin: 10px 0; cursor: pointer; }
+  .same-story-flag:hover { background: rgba(157,150,255,0.12); }
+  .same-story-flag .ssf-icon { flex-shrink: 0; }
+
+  /* note: single-line (or short multi-line) callouts with a colored
+     left edge. */
+  .note { font-size: 0.78rem; line-height: 1.5; padding: 6px 10px; border-radius: 6px; margin-bottom: 6px; }
+  .note-red { background: rgba(255,107,107,0.08); color: #ff9f9f; border-left: 3px solid #ff6b6b; }
+  .note-gold { background: var(--gold-dim); color: var(--gold); border-left: 3px solid var(--gold); }
+  .note-dim { color: var(--dim); border-left: 3px solid var(--border-accent); background: rgba(255,255,255,0.02); font-size: 0.74rem; }
+
+  /* ALTERNATE STORY TOGGLE — Block Anatomy, Story block part 9 only.
+     Knowledge blocks never get one. Lives inside the same q-block
+     behind this toggle, no separate tab. */
+  .fallback-toggle { display: flex; align-items: center; gap: 6px; width: 100%; font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.8px; text-transform: uppercase; background: rgba(157,150,255,0.08); color: var(--accent-2); border: 1px dashed var(--border-accent); border-radius: 6px; padding: 7px 12px; margin-top: 14px; cursor: pointer; user-select: none; }
+  .fallback-toggle .fb-chevron { margin-left: auto; transition: transform 0.2s; }
+  .fallback-toggle.open .fb-chevron { transform: rotate(180deg); }
+  .fallback-content { display: none; margin-top: 10px; padding: 12px 14px; background: #0d0d1a; border: 1px solid var(--border); border-left: 3px solid var(--accent-2); border-radius: 0 8px 8px 0; }
+  .fallback-content.visible { display: block; }
+  .fallback-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--accent-2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+  /* PROBE BOX — follow-ups (Block Anatomy part 8 for Story blocks,
+     part 3 for Knowledge blocks). Every number gets a "what were the
+     numbers / give me one example" follow-up. Each line tagged so
+     it's obvious which are confirmed real and which are drafted and
+     still need your confirmation before relying on them live. */
+  .probe-box { margin-top: 14px; border-top: 1px solid var(--border); padding: 12px 0 0; font-size: 0.86rem; }
+  .probe-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .probe-box ul { padding-left: 16px; }
+  .probe-box li { margin-bottom: 9px; line-height: 1.55; }
+  .probe-box strong { color: var(--text); font-weight: 600; }
+  .probe-cue { color: var(--text); opacity: 0.85; }
+  .probe-tag { display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.6px; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+  .probe-tag.confirm { background: rgba(255,107,107,0.1); color: #ff9f9f; border: 1px solid rgba(255,107,107,0.35); }
+  .probe-tag.draft { background: rgba(157,150,255,0.08); color: var(--accent-2); border: 1px solid var(--border-accent); }
+  /* .probe-tag.confirm = a specific claim that must be verified against
+     the data bank before being said live — shows as a red dot until
+     confirmed. .probe-tag.draft = your honest judgment/approach,
+     not a data-bank fact, so it never needs a source line, but it
+     should still sound like you. */
+
+  /* RESTRICTED-DETAIL BOUNDARY LINE — a follow-up answer variant used
+     when a probe would require disclosing a restricted program/
+     classification detail. Honest "restricted" framing, never an
+     invented specific. */
+  .boundary-line { font-size: 0.78rem; color: var(--dim); font-style: italic; margin-top: 4px; }
+
+  /* INTEL GRID */
+  .intel-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap: 10px; padding-top: 14px; }
+  .intel-card { background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; padding: 13px 15px; scroll-margin-top: calc(var(--sub,148px) + 10px); }
+  .intel-card-title { font-family: 'DM Mono', monospace; font-size: 0.67rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent-2); margin-bottom: 7px; }
+
+  /* UTILITIES */
+  .pitch-box { background: var(--card-2); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 15px 17px; margin-top: 12px; }
+  .gap-box { background: rgba(255,107,107,0.07); border: 1px solid rgba(255,107,107,0.25); border-radius: 8px; padding: 12px 15px; margin-top: 10px; font-size: 0.86rem; }
+  .gap-box .gap-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--danger); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+  .comp-block { background: var(--card-2); border: 1px solid var(--border-accent); border-radius: 8px; padding: 14px 16px; margin-top: 12px; scroll-margin-top: calc(var(--sub,148px) + 10px); }
+  .comp-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; gap: 12px; }
+  .comp-row:last-child { border-bottom: none; }
+  .comp-row .label { color: var(--dim); font-family: 'DM Mono', monospace; font-size: 0.73rem; white-space: nowrap; }
+  .comp-row .value { color: var(--text); font-weight: 500; text-align: right; }
+  .comp-row .value.gold { color: var(--gold); }
+  .comp-row .value.green { color: var(--success); }
+
+  /* ASK-THEM TIER CARDS */
+  .ask-tier { margin-top: 14px; }
+  .ask-tier-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+  /* TILES — clickable, jump to the block or card they describe. Used
+     for Resume Map rows, JD Map rows, Key Terms/Concepts, Focus Card
+     theme links. */
+  .term-tile { background: var(--card); border: 1px solid var(--border); border-radius: 5px; padding: 9px 11px; font-size: 0.82rem; cursor: pointer; }
+  .term-tile:hover { border-color: var(--border-accent); background: var(--card-2); }
+  .term-tile .term-jump-hint { display: block; font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--accent-2); margin-top: 5px; opacity: 0.8; }
+
+  /* STICKY ESSENTIALS STRIP — Overview > Summary only. top offset is
+     set at runtime to sit right under whatever subtab-nav height is. */
+  .essentials-strip { position: sticky; top: calc(var(--sub,148px) + 6px); z-index: 80; background: #0d0f1a; border: 1px solid var(--border-accent); border-radius: 8px; padding: 10px 14px; margin: 14px 0; display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.8rem; box-shadow: 0 4px 20px rgba(0,0,0,0.35); }
+  .essentials-strip .ess-item { display: flex; align-items: baseline; gap: 6px; }
+  .essentials-strip .ess-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.8px; }
+  .essentials-strip .ess-val { color: var(--gold); font-weight: 600; }
+
+  /* VALUES GRID — Values tab, optional [slot]. Only built when the
+     target company has real, named, publicly documented values,
+     leadership principles, or engineering practices (see README's
+     Company Values Alignment and the Values Tab). Tap a value name
+     for what it means / why it matters here / a quick example; tap a
+     story chip to jump straight to the story that proves it, "alt"
+     for the alternate-angle version of a different story. */
+  .lp-help { font-size: 0.8rem; color: var(--dim); padding: 12px 0 10px; border-bottom: 1px solid var(--border); }
+  .lp-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
+  .lp-row { display: grid; grid-template-columns: 230px 1fr; gap: 10px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); scroll-margin-top: calc(var(--sub,148px) + 12px); }
+  .lp-row.open .lp-caret { transform: rotate(90deg); }
+  .lp-row.open .lp-def { display: block; }
+  .lp-name { font-size: 0.82rem; font-weight: 600; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .lp-name:hover { color: var(--accent-2); }
+  .lp-caret { color: var(--accent-2); font-size: 0.8rem; transition: transform 0.15s; }
+  .lp-links { display: flex; flex-wrap: wrap; gap: 5px; }
+  .lp-link { font-size: 0.72rem; padding: 3px 8px; border-radius: 12px; background: var(--card-2); border: 1px solid var(--border-accent); cursor: pointer; white-space: nowrap; }
+  .lp-link b { color: var(--accent-2); font-family: 'DM Mono', monospace; font-weight: 500; }
+  .lp-link.alt { border-style: dashed; }
+  .lp-link.alt b { color: var(--gold); }
+  .lp-link:hover { background: #1c1c2a; }
+  .lp-def { display: none; grid-column: 1 / -1; background: var(--card-2); border-left: 3px solid var(--accent-2); border-radius: 0 6px 6px 0; padding: 9px 12px; font-size: 0.88rem; line-height: 1.6; }
+  .lp-def p { margin: 3px 0; }
+  .lp-def b { color: var(--accent-2); font-weight: 600; }
+  @media (max-width:600px) { .lp-row { grid-template-columns: 1fr; gap: 4px; } }
+
+  /* SEARCH BAR + JUMP-TO DROPDOWN */
+  #search-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; background: #0a0c14; border-top: 1px solid var(--border-accent); padding: 10px 16px 12px; box-shadow: 0 -6px 30px rgba(0,0,0,0.5); }
+  .search-row { display: flex; align-items: center; gap: 10px; max-width: 960px; margin: 0 auto; }
+  .search-input { flex: 1; min-width: 0; background: #0d0d1a; border: 1px solid var(--border-accent); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; padding: 9px 14px; outline: none; }
+  .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .search-clear { font-size: 1rem; color: var(--dim); cursor: pointer; padding: 4px 8px; display: none; }
+  .search-clear.visible { display: block; }
+  .jump-select { background: #16161f; color: var(--text); border: 1px solid var(--border-accent); border-radius: 6px; padding: 7px 8px; font-size: 0.8rem; max-width: 190px; }
+  .back-btn { font-family: 'DM Mono', monospace; font-size: 0.62rem; text-transform: uppercase; color: var(--dim); background: #16161f; border: 1px solid var(--border); border-radius: 6px; padding: 7px 12px; cursor: pointer; display: none; flex-shrink: 0; }
+  .back-btn.visible { display: flex; }
+  #search-results-bar { position: fixed; bottom: 56px; left: 0; right: 0; z-index: 199; background: #0e0e1a; border-top: 1px solid var(--border); max-height: 360px; overflow-y: auto; display: none; }
+  #search-results-bar.visible { display: block; }
+  .search-result { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid var(--border); }
+  .search-result:hover { background: #16161f; }
+  .sr-tag { font-family: 'DM Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; min-width: 90px; }
+  .sr-label { font-size: 0.86rem; font-weight: 600; flex: 1; }
+  .sr-sub { font-size: 0.74rem; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
+  .search-no-results { padding: 14px 20px; font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--dim); }
+  @media (max-width:600px) { .intel-grid { grid-template-columns:1fr; } .tab-btn { padding:0 12px; font-size:0.62rem; } .sr-sub { display:none; } .comp-row { flex-direction:column; } .comp-row .value { text-align:left; } .jump-select { max-width:110px; font-size:0.72rem; } .header-left h1 { font-size:1.25rem; } #back-btn { display:none !important; } }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ═══════════════════════════════════════════════════════════
+  One plain line. No badges, no Study Mode toggle — every must-say
+  (date, interviewer, comp, remote/onsite) lives in the Essentials
+  Strip inside Overview > Summary instead, where it's easier to scan.
+  h1:       [COMPANY] <span>[PROGRAM / DIVISION IF APPLICABLE]</span>
+  subtitle: [ROLE] · Round [N]: [TYPE] · [SCHEDULED/NOT YET SCHEDULED]
+            · [LOCATION] · [ONE-WORD CONTEXT NOTE, e.g. "Internal move"]
+═══════════════════════════════════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <h1>[COMPANY] <span>[PROGRAM / DIVISION]</span></h1>
+      <div class="subtitle">[ROLE] &middot; Round [N]: [TYPE] &middot; [DATE/STATUS] &middot; [LOCATION] &middot; [NOTE]</div>
+    </div>
+  </div>
+</header>
+
+<!-- SEVEN TABS, FIXED ORDER: Overview, Resume Stories (delete this
+     button and its tab-panel if no resume was submitted), JD Question
+     Stories, Extra Stories, Technical Knowledge, Values [optional slot — delete the button
+     below and its tab-panel if the company has no real, named,
+     published values/principles/practices], Intel. -->
+<nav class="tab-nav" id="main-tabs">
+  <div class="tab-btn active" onclick="switchMainTab('overview')" data-tab="overview">&#127919; Overview</div>
+  <div class="tab-btn" onclick="switchMainTab('resume')" data-tab="resume">&#128196; Resume Stories</div>
+  <div class="tab-btn" onclick="switchMainTab('jd')" data-tab="jd">&#128221; JD Question Stories</div>
+  <div class="tab-btn" onclick="switchMainTab('extra')" data-tab="extra">&#128172; Extra Stories</div>
+  <div class="tab-btn" onclick="switchMainTab('tech')" data-tab="tech">&#128295; Technical Knowledge</div>
+  <!-- VALUES TAB — optional slot. Uncomment this button AND the
+       tab-panel near the bottom when the company has real, named,
+       published values/principles. Also uncomment the 'values' line
+       in SUBTABS and add its ANCHOR_MAP/SEARCH_INDEX entries.
+  <div class="tab-btn" onclick="switchMainTab('values')" data-tab="values">&#11088; Values</div>
+  -->
+  <div class="tab-btn" onclick="switchMainTab('intel')" data-tab="intel">&#127970; Intel</div>
+</nav>
+<div class="subtab-nav" id="subtab-nav"></div>
+
+<div class="main">
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+  TAB: OVERVIEW — Summary | Pitch | Ask Them | Interview Tips | Closing
+════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel active" id="tab-overview">
+
+  <div class="subtab-panel active" id="sub-overview-summary">
+
+    <!-- ANCHOR LINE: hero box. Built from the Repeatable Capability
+         Anchor (README), evidenced by whichever real accomplishment
+         fits this specific call best. 3-4 sentences, said in the
+         first answer. -->
+    <div style="background:rgba(255,200,87,0.1);border:2px solid var(--gold);border-radius:10px;padding:16px 20px;margin-top:14px">
+      <div style="font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:9px">&#9733; [ROUND CONTEXT: "Round 1: Recruiter Screen" / "Panel — Technical Depth" / etc.]</div>
+      <div style="font-size:0.95rem;line-height:1.65;color:var(--text);font-weight:500">&ldquo;[THE ANCHOR LINE. Specific to this JD. 3-4 sentences, plus why this industry.]&rdquo;</div>
+      <div style="font-size:0.78rem;color:var(--dim);margin-top:8px;font-style:italic">[When to say it. What to do right after.]</div>
+    </div>
+
+    <!-- STICKY ESSENTIALS STRIP — do not remove. 3-5 absolute must-says:
+         clearance, target comp, your anchor strength, your known gap,
+         location/onsite. -->
+    <div class="essentials-strip">
+      <div class="ess-item"><span class="ess-label">Clearance</span><span class="ess-val">[If applicable]</span></div>
+      <div class="ess-item"><span class="ess-label">Target</span><span class="ess-val">$[LOW]K&ndash;$[HIGH]K</span></div>
+      <div class="ess-item"><span class="ess-label">Anchor</span><span class="ess-val">[3-6 word differentiator]</span></div>
+      <div class="ess-item"><span class="ess-label">Gap</span><span class="ess-val">[Known gap, one short phrase]</span></div>
+      <div class="ess-item"><span class="ess-label">Location</span><span class="ess-val">[Relocation/remote stance for this role]</span></div>
+    </div>
+
+    <div class="intel-grid">
+
+      <!-- FOCUS CARD [slot] — only if the recruiter or hiring team
+           named what they will score (named values, themes, format,
+           length, number of interviewers). Delete the whole card if
+           nothing like this was communicated. Flag any sample answers
+           they sent that contain details not in the data bank. -->
+      <div class="intel-card" id="card-focus" style="grid-column:1/-1;border-color:rgba(255,200,87,0.45)">
+        <div class="intel-card-title" style="color:var(--gold)">Focus Card: What They Told Us They're Scoring</div>
+        <div class="prose">
+          <p><strong>Named themes/values:</strong> [What the recruiter/HM said, verbatim where possible.]</p>
+          <p><strong>Format:</strong> [Length, number of interviewers, panel vs 1:1, written vs verbal.]</p>
+          <!-- One line per named theme, linking to the stories that answer it:
+          <p>[Theme] &rarr; <a href="#q-res-1">[label]</a> &middot; <a href="#q-jd-1">[label]</a></p>
+          -->
+          <!-- If they sent a sample answer or rubric with specifics not in the data bank:
+          <p class="note note-red">Sample answer they sent includes [detail] — not in the data bank. Flagged, not used until confirmed.</p>
+          -->
+        </div>
+      </div>
+
+      <!-- RESUME MAP — every bullet actually submitted, mapped to the
+           story that defends it, clickable. Primary coverage mechanism
+           (README Rule 10), independent of the JD Map below. -->
+      <div class="intel-card" id="card-resume-map" style="grid-column:1/-1;border-color:rgba(255,200,87,0.45)">
+        <div class="intel-card-title" style="color:var(--gold)">Resume Map: Every Bullet, Defended</div>
+        <div class="prose">
+          <!-- One line per resume bullet actually submitted, verbatim, linked to its primary story in Resume Stories. Repeat for every bullet on the submitted resume:
+          <p><em>&ldquo;[Exact resume bullet]&rdquo;</em> &rarr; <a href="#q-res-1">[Story label]</a></p>
+          -->
+        </div>
+      </div>
+
+      <div class="intel-card" id="card-stage">
+        <div class="intel-card-title">Stage &amp; Role Overview</div>
+        <div class="prose">
+          <p><strong>Stage:</strong> [Round N, scheduled or not. What's already been passed.]</p>
+          <p><strong>Role:</strong> [One or two sentences, pulled from the JD. Commercial/startup build: keep this one sentence unclassified and plain, so "what was the system?" never sounds evasive — see README's Sector-Coded Language Rule.]</p>
+        </div>
+      </div>
+
+      <!-- INTERVIEWER CARD — background, how to play it, real common
+           ground, JD priorities in order. Merges what used to be two
+           separate concepts (interviewer research + depth matched to
+           the interviewer) into one card. -->
+      <div class="intel-card" id="card-interviewer">
+        <div class="intel-card-title">Interviewer Card</div>
+        <div class="prose">
+          <p><strong>Background:</strong> [Named interviewer(s), real background where known.]</p>
+          <p><strong>How to play it:</strong> [Depth level to pitch at — textbook vs practitioner vs leadership, based on who they are.]</p>
+          <p><strong>Common ground:</strong> [Real shared programs/employers/schools/locations — never manufactured.]</p>
+          <p><strong>JD priorities, in order:</strong> [1. ... 2. ... 3. ...]</p>
+        </div>
+      </div>
+
+      <!-- JD MAP — secondary coverage card. Each JD requirement/
+           responsibility phrase, quoted verbatim, linking to its
+           JD Question Stories block (and any other block that backs it). Still required alongside the Resume
+           Map above (README Rule 10). -->
+      <div class="intel-card" id="card-jdmap" style="grid-column:1/-1;border-color:rgba(255,200,87,0.45)">
+        <div class="intel-card-title" style="color:var(--gold)">JD Map: Secondary Coverage Check</div>
+        <div class="prose">
+          <!-- One line per JD phrase. Repeat for every requirement/responsibility/preferred qual:
+          <p><em>&ldquo;[Exact JD phrase]&rdquo;</em> &rarr; <a href="#q-jd-1">[label]</a> &middot; <a href="#q-tech-1">[label]</a></p>
+          -->
+        </div>
+      </div>
+
+      <!-- IF YOU LOSE YOUR PLACE — always include. -->
+      <div class="intel-card" id="card-recover" style="grid-column:1/-1;border-color:rgba(62,207,142,0.4)">
+        <div class="intel-card-title" style="color:var(--success)">If You Lose Your Place</div>
+        <div class="prose">
+          <p>&ldquo;Let me take a second to pick the best example for that.&rdquo;</p>
+          <p>&ldquo;Let me give you the short version first.&rdquo;</p>
+          <p>&ldquo;Is that more about [angle A] or [angle B]?&rdquo;</p>
+          <p>&ldquo;I haven't done that directly. Here's the closest thing I have done.&rdquo;</p>
+          <p><span style="color:var(--dim)">A pause reads as thoughtful. Rambling to fill it is what hurts.</span></p>
+        </div>
+      </div>
+
+      <!-- LOGISTICS & COMP — join instructions, comp script, what to
+           say if asked about comp early. -->
+      <div class="intel-card" id="card-comp" style="grid-column:1/-1">
+        <div class="intel-card-title">Logistics &amp; Comp</div>
+        <div class="prose" style="margin-bottom:8px"><p><strong>Join instructions:</strong> [Link/dial-in, device/room, any pre-call tech check.]</p></div>
+        <div class="comp-block" style="margin-top:0">
+          <div class="comp-row"><span class="label">JD / Posted Range</span><span class="value">$[MIN] &ndash; $[MAX]</span></div>
+          <div class="comp-row"><span class="label">Current Base</span><span class="value">$[CURRENT]</span></div>
+          <div class="comp-row"><span class="label">Fit Tier</span><span class="value gold">[Bottom / Mid / Top &mdash; one sentence why]</span></div>
+          <div class="comp-row"><span class="label">Recommended Ask</span><span class="value gold">$[TARGET_LOW] &ndash; $[TARGET_HIGH]</span></div>
+          <div class="comp-row"><span class="label">If Number Already Given</span><span class="value">[State exactly what was said, to whom, when &mdash; or "N/A, not yet discussed"]</span></div>
+        </div>
+        <div style="background:rgba(62,207,142,0.08);border:1px solid rgba(62,207,142,0.25);border-radius:6px;padding:10px 14px;margin-top:12px;font-size:0.84rem"><strong style="color:var(--success)">Lead with the justification. Then give the number.</strong></div>
+        <div style="background:#0d0d1a;border:1px solid var(--border-accent);border-radius:6px;padding:12px 15px;margin-top:10px;font-size:0.86rem;line-height:1.7">
+          <div style="font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--accent-2);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Script: If Asked About Comp Early</div>
+          <p>&ldquo;[Context first: clearance/credential if relevant, domain-depth proof, current-role proof. Then the number.]&rdquo;</p>
+        </div>
+        <div style="background:rgba(255,107,107,0.06);border:1px solid rgba(255,107,107,0.2);border-radius:6px;padding:10px 14px;margin-top:10px;font-size:0.82rem"><strong style="color:#ff9f9f">If offer arrives:</strong> [bonus structure / equity type / vesting / relocation terms, whatever applies]. Not during interviews.</div>
+      </div>
+
+    </div>
+  </div><!-- /sub-overview-summary -->
+
+  <!-- SUB: PITCH ─────────────────────────────────────────────────────── -->
+  <div class="subtab-panel" id="sub-overview-pitch">
+    <div class="section-block open" id="sec-why-them">
+      <div class="section-header" onclick="toggleSection(this)"><span class="section-num">01</span><span class="section-title">Why This Role</span><span class="section-chevron">&#9660;</span></div>
+      <div class="section-body"><div class="prose"><p>&ldquo;[Specific program/product/mission knowledge that shows homework was done. Excited, specific, accurate. Include "I learn new systems fast" if the domain is new.]&rdquo;</p></div></div>
+    </div>
+    <div class="section-block" id="sec-why-leaving">
+      <div class="section-header" onclick="toggleSection(this)"><span class="section-num">02</span><span class="section-title">Why I'm Leaving [CURRENT EMPLOYER]</span><span class="section-chevron">&#9660;</span></div>
+      <div class="section-body"><div class="prose"><p>&ldquo;[Factual, never negative, forward-looking.]&rdquo;</p></div></div>
+    </div>
+    <div class="section-block" id="sec-pitch">
+      <div class="section-header" onclick="toggleSection(this)"><span class="section-num">03</span><span class="section-title">Elevator Pitch</span><span class="section-chevron">&#9660;</span></div>
+      <div class="section-body">
+        <div class="pitch-box"><div class="prose">
+          <p><strong style="color:var(--gold)">PAST</strong></p>
+          <p>&ldquo;[Foundation. One metric that threads to this specific role.]&rdquo;</p>
+          <p><strong style="color:var(--gold)">PRESENT</strong></p>
+          <p>&ldquo;[2-3 accomplishments most directly relevant to this JD.]&rdquo;</p>
+          <p><strong style="color:var(--gold)">FUTURE</strong></p>
+          <p>&ldquo;[Why this company, why this role, why now. "Not a pivot, a direct extension."]&rdquo;</p>
+          <p><strong style="color:var(--gold)">OUTSIDE WORK</strong></p>
+          <p>&ldquo;[One short, human line — what you do outside work.]&rdquo;</p>
+        </div></div>
+        <div class="gap-box" style="margin-top:12px"><div class="gap-label">After the Pitch</div><div class="prose"><p>&ldquo;Does that give you a good picture, or is there a part you want me to go deeper on?&rdquo;</p></div></div>
+      </div>
+    </div>
+    <div class="section-block" id="sec-walkthrough">
+      <div class="section-header" onclick="toggleSection(this)"><span class="section-num">04</span><span class="section-title">Resume Walkthrough (2 min)</span><span class="section-chevron">&#9660;</span></div>
+      <div class="section-body"><div class="prose"><p style="background:#0d0d1a;border:1px solid var(--border-accent);border-radius:6px;padding:10px 13px;font-size:0.86rem;line-height:1.65">&ldquo;[2-3 sentences per employer, most relevant to this JD. Happy to go deeper anywhere.]&rdquo;</p></div></div>
+    </div>
+  </div><!-- /sub-overview-pitch -->
+
+  <!-- SUB: ASK THEM ─────────────────────────────────────────────────────
+       Tiered: Recruiter / Hiring Manager / This Interviewer / Ask Like
+       a Teammate / Peer or Panel. If the JD carries a gate (export
+       license, clearance, relocation, a required degree not held)
+       always add a recruiter-tier question that surfaces it during
+       scheduling rather than letting it surface as a surprise
+       screen-out later. -->
+  <div class="subtab-panel" id="sub-overview-ask">
+    <div class="section-block open" id="sec-ask-them">
+      <div class="section-header" onclick="toggleSection(this)"><span class="section-num">&#9733;</span><span class="section-title">Questions to Ask, By Who's Asking</span><span class="section-chevron">&#9660;</span></div>
+      <div class="section-body">
+        <div class="section-intro">Ask 2 per conversation. Never repeat the same question to two different people on the same day.</div>
+        <div class="ask-tier"><div class="ask-tier-label">Recruiter Level</div>
+          <!-- q-block, include one gate/contingency question if the JD has a gate -->
+        </div>
+        <div class="ask-tier"><div class="ask-tier-label">Hiring Manager Level</div>
+          <!-- q-blocks: scope, success criteria, team structure -->
+        </div>
+        <div class="ask-tier"><div class="ask-tier-label">This Interviewer</div>
+          <!-- q-blocks: tailored to who is actually on this call -->
+        </div>
+        <div class="ask-tier"><div class="ask-tier-label">Ask Like a Teammate</div>
+          <div class="section-intro" style="padding-top:0;border-bottom:none;margin-bottom:8px">Phrased as if already on the team: scaling pain, handoffs, first problem to pick up, how new hires ramp.</div>
+          <!-- q-blocks -->
+        </div>
+        <div class="ask-tier"><div class="ask-tier-label">Peer / Panel Level</div>
+          <!-- q-blocks: day-to-day tools, hardest technical problem right now, culture -->
+        </div>
+        <!-- ASK-BLOCK TEMPLATE:
+        <div class="q-block" id="ask-[tier]-1">
+          <div class="q-header" onclick="toggleQ(this)">
+            <span class="q-num">Q</span>
+            <div class="q-header-text">
+              <span class="q-title-text">&ldquo;[Exact question as it would actually be asked]&rdquo;</span>
+              <div class="study-cue">Ask: [WHO] &middot; [one-line why it lands]</div>
+            </div>
+            <span class="q-chevron">&#9660;</span>
+          </div>
+          <div class="q-body"><div class="prose"><p>[Coaching note.]</p></div></div>
+        </div>
+        -->
+      </div>
+    </div>
+  </div><!-- /sub-overview-ask -->
+
+  <!-- SUB: INTERVIEW TIPS — do not change between roles. -->
+  <div class="subtab-panel" id="sub-overview-tips">
+    <div class="section-block" id="sec-tips">
+      <div class="section-header" onclick="toggleSection(this)"><span class="section-num">&#9733;</span><span class="section-title">Interview Edge: Techniques That Work</span><span class="section-chevron">&#9660;</span></div>
+      <div class="section-body">
+        <div class="section-intro">Mirroring / Labeling / Calibrated Questions / Strategic Silence / Check-Ins.</div>
+        <!-- tip-mirroring, tip-labeling, tip-calibrated, tip-silence, tip-checkins q-blocks go here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- SUB: CLOSING ──────────────────────────────────────────────────── -->
+  <div class="subtab-panel" id="sub-overview-closing">
+    <div class="section-block" id="sec-closing">
+      <div class="section-header" onclick="toggleSection(this)"><span class="section-num">&#9733;</span><span class="section-title">Closing the Interview Strong</span><span class="section-chevron">&#9660;</span></div>
+      <div class="section-body">
+        <div class="pitch-box" style="margin-top:12px"><div class="prose">
+          <p>&ldquo;[Clear, specific, short. Why this role, clearance/location note if applicable.]&rdquo;</p>
+          <p style="margin-top:10px"><strong style="color:var(--gold)">Then:</strong> &ldquo;What are next steps and what does your timeline look like?&rdquo; Then stop.</p>
+          <p style="color:var(--dim);font-size:0.82rem;margin-top:6px">Strategic silence. Let them answer.</p>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-overview -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+  TAB: RESUME STORIES — the resume actually submitted, in order,
+  grouped by company. Each bullet quoted word for word in a gold box,
+  with its story (a Story block, see Block Anatomy) directly under it.
+  Bullets that share a story are grouped above that one story. Every
+  bullet must have a primary story — if a bullet is only covered by
+  an alternate, promote it to its own block.
+════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-resume">
+
+  <!-- COMPANY GROUP TEMPLATE (repeat per employer on the submitted
+       resume, in resume order; section-num = 01, 02, 03...):
+  <div class="section-block open" id="sec-resume-[company]">
+    <div class="section-header" onclick="toggleSection(this)"><span class="section-num">01</span><span class="section-title">[Company Name]</span><span class="section-chevron">&#9660;</span></div>
+    <div class="section-body">
+
+      RESUME-BULLET-GROUP TEMPLATE (repeat per story; stack more than
+      one .resume-bullet above a single story block when bullets share it):
+      <div class="resume-bullet-group">
+        <div class="resume-bullet">&ldquo;[Exact resume bullet, quoted word for word]&rdquo;</div>
+
+        STORY BLOCK (Block Anatomy):
+        <div class="q-block" id="q-res-[company]-1">
+          <div class="q-header" onclick="toggleQ(this)">
+            <span class="q-num">1</span>
+            <div class="q-header-text">
+              <span class="q-title-text">[Question/cue this story answers] <span class="q-badge gold">[Focus/tip note, if any]</span><span class="q-badge red">[Confirm before using, if any]</span></span>
+              <div class="study-cue">[One-line memory hook: the method/number/result, not the whole story]</div>
+            </div>
+            <span class="q-chevron">&#9660;</span>
+          </div>
+          <div class="q-body">
+            <div class="note note-dim">Use when: &ldquo;[Question phrasing(s) that trigger this story]&rdquo;</div>
+            <div class="culture-note">Culture fit: [Real, documented company value or culture signal this story shows through what happened, cited in Intel. Coaching only, never said out loud. Omit if no honest fit.]</div>
+
+            SAME-STORY FLAG — only if this exact event is told in full
+            elsewhere. Points to that block instead of retelling it:
+            <div class="same-story-flag" onclick="jumpTo('q-[other-block-id]')"><span class="ssf-icon">&#128257;</span> Same story as &ldquo;[other question]&rdquo; &mdash; told in full there.</div>
+
+            <div class="story-head"><span>Main story &middot; [Company]</span></div>
+            <div class="prose">
+              <div class="star-label">Situation</div><p>[Scale/stakes marker, concrete, from the data bank.]</p>
+              <div class="star-label">Task</div><p>[What was owned, specifically.]</p>
+              <div class="star-label">Action</div><p>[Real steps, "I" not "we," tools expanded on first use.]</p>
+              <div class="star-label">Result</div><p>[Metric or concrete outcome.] <strong>[Bold closer: the transferable principle.]</strong></p>
+              <div class="story-source">Source: [Company] &middot; [Data Bank entry ID]</div>
+            </div>
+
+            DEEPER DIVE — hardest part, a hiccup and how you recovered,
+            what could have gone wrong, what you'd do differently.
+            Only opened/said if asked:
+            <div class="prose" style="margin-top:10px">
+              <div class="star-label">Deeper Dive (only if asked)</div>
+              <p><strong>Hardest part:</strong> [...]</p>
+              <p><strong>A hiccup and how I recovered:</strong> [...]</p>
+              <p><strong>What could have gone wrong:</strong> [...]</p>
+              <p><strong>What I'd do differently:</strong> [...]</p>
+            </div>
+
+            FOLLOW-UPS — always include "what were the numbers / give me
+            one example" for every number, and the honest boundary line
+            for restricted details where it applies:
+            <div class="probe-box">
+              <div class="probe-label">If they keep probing</div>
+              <ul>
+                <li><strong>&ldquo;What were the numbers?&rdquo;</strong> <span class="probe-tag confirm">Only say it if true</span><br><span class="probe-cue">&ldquo;[Drafted answer with a placeholder for the real specific.]&rdquo;</span></li>
+                <li><strong>&ldquo;What would you do differently?&rdquo;</strong> <span class="probe-tag draft">Your judgment</span><br><span class="probe-cue">&ldquo;[Honest answer.]&rdquo;</span></li>
+                <li><strong>&ldquo;[Follow-up that would require a restricted detail]&rdquo;</strong> <span class="probe-tag draft">Your judgment</span><br><span class="probe-cue">&ldquo;[Honest unclassified context.]&rdquo;</span><div class="boundary-line">Restricted &mdash; can speak to approach and outcome, not program specifics.</div></li>
+              </ul>
+            </div>
+
+            ALTERNATE STORY TOGGLE:
+            <div class="fallback-toggle" onclick="toggleFallback(this)"><span>&#128260; Alternate story &middot; [Company]</span><span class="fb-chevron">&#9660;</span></div>
+            <div class="fallback-content">
+              <div class="fallback-label">[Different angle, one short label]</div>
+              <div class="prose">
+                <div class="star-label">Situation</div><p>[...]</p>
+                <div class="star-label">Task</div><p>[...]</p>
+                <div class="star-label">Action</div><p>[...]</p>
+                <div class="star-label">Result</div><p>[Metric.] <strong>[Closer.]</strong></p>
+                <div class="story-source">Source: [Company] &middot; [Data Bank entry ID]</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  -->
+
+</div><!-- /tab-resume -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+  TAB: JD QUESTION STORIES — every JD requirement, responsibility, and
+  preferred qualification, in the JD's own order, grouped Required /
+  Preferred / Responsibilities. Each JD line is quoted word for word
+  in a .jd-req box with its tag, and its block sits directly under it.
+  Three block variants (templates below): FULL story where the data
+  bank has a real story the resume does not carry, POINTER where a
+  resume story already answers the line (same-story flag, tell it
+  once), GAP where nothing honest exists. Every full story is STAR,
+  with deeper dive, follow-ups, alternate story, and a Culture fit
+  note, same as Resume Stories.
+════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-jd">
+  <div class="toc">
+    <!-- toc-links to the three groups below -->
+    <span class="toc-link" onclick="jumpTo('sec-jd-required')">Required</span>
+    <span class="toc-link" onclick="jumpTo('sec-jd-preferred')">Preferred</span>
+    <span class="toc-link" onclick="jumpTo('sec-jd-resp')">Responsibilities</span>
+  </div>
+
+  <div class="section-block open" id="sec-jd-required">
+    <div class="section-header" onclick="toggleSection(this)"><span class="section-num">01</span><span class="section-title">Required Qualifications</span><span class="section-chevron">&#9660;</span></div>
+    <div class="section-body">
+      <!-- VARIANT A: FULL STORY (ids q-jd-1, q-jd-2... numbered J1, J2...)
+      <div class="resume-bullet-group">
+        <div class="jd-req"><span class="jd-tag required">Required</span>&ldquo;[Exact JD phrase]&rdquo;</div>
+        <div class="q-block" id="q-jd-1">
+          <div class="q-header" onclick="toggleQ(this)">
+            <span class="q-num">J1</span>
+            <div class="q-header-text">
+              <span class="q-title-text">[Question an interviewer would ask to test this line] <span class="q-badge gold">[Focus/tip, if any]</span><span class="q-badge red">[Confirm before using, if any]</span></span>
+              <div class="study-cue">[One-line memory hook: method, number, result]</div>
+            </div>
+            <span class="q-chevron">&#9660;</span>
+          </div>
+          <div class="q-body">
+            <div class="note note-dim">Use when: &ldquo;[JD phrase and question phrasings that trigger this]&rdquo;</div>
+            <div class="culture-note">Culture fit: [Real documented value or culture signal, cited in Intel. Coaching only. Omit if no honest fit.]</div>
+            <div class="story-head"><span>Main story &middot; [Company]</span></div>
+            <div class="prose">
+              <div class="star-label">Situation</div><p>[Scale/stakes marker from the data bank.]</p>
+              <div class="star-label">Task</div><p>[What was owned.]</p>
+              <div class="star-label">Action</div><p>[Real steps, "I" not "we," real mechanism, tools expanded on first use.]</p>
+              <div class="star-label">Result</div><p>[Metric or concrete outcome.] <strong>[Personal closer that fits this company's values.]</strong></p>
+              <div class="story-source">Source: [Company] &middot; [Data Bank entry ID]</div>
+            </div>
+            <div class="prose" style="margin-top:10px">
+              <div class="star-label">Deeper Dive (only if asked)</div>
+              <p><strong>Hardest part:</strong> [...]</p>
+              <p><strong>A hiccup and how I recovered:</strong> [...]</p>
+              <p><strong>What could have gone wrong:</strong> [...]</p>
+              <p><strong>What I'd do differently:</strong> [...]</p>
+            </div>
+            <div class="probe-box">
+              <div class="probe-label">If they keep probing</div>
+              <ul>
+                <li><strong>&ldquo;What were the numbers?&rdquo;</strong> <span class="probe-tag confirm">Only say it if true</span><br><span class="probe-cue">&ldquo;[Drafted answer.]&rdquo;</span></li>
+                <li><strong>&ldquo;What would you do differently?&rdquo;</strong> <span class="probe-tag draft">Your judgment</span><br><span class="probe-cue">&ldquo;[Honest answer.]&rdquo;</span></li>
+              </ul>
+            </div>
+            <div class="fallback-toggle" onclick="toggleFallback(this)"><span>&#128260; Alternate story &middot; [Company]</span><span class="fb-chevron">&#9660;</span></div>
+            <div class="fallback-content">
+              <div class="fallback-label">[Different angle, one short label]</div>
+              <div class="prose">
+                <div class="star-label">Situation</div><p>[...]</p>
+                <div class="star-label">Task</div><p>[...]</p>
+                <div class="star-label">Action</div><p>[...]</p>
+                <div class="star-label">Result</div><p>[Metric.] <strong>[Closer.]</strong></p>
+                <div class="story-source">Source: [Company] &middot; [Data Bank entry ID]</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      VARIANT B: POINTER (a resume story already answers this JD line; no second retelling,
+      no alternate toggle here, the alternate lives on the block it points to):
+      <div class="resume-bullet-group">
+        <div class="jd-req"><span class="jd-tag required">Required</span>&ldquo;[Exact JD phrase]&rdquo;</div>
+        <div class="q-block" id="q-jd-2">
+          <div class="q-header" onclick="toggleQ(this)">
+            <span class="q-num">J2</span>
+            <div class="q-header-text">
+              <span class="q-title-text">[Question an interviewer would ask]</span>
+              <div class="study-cue">[Memory hook for the angle on this JD line]</div>
+            </div>
+            <span class="q-chevron">&#9660;</span>
+          </div>
+          <div class="q-body">
+            <div class="culture-note">Culture fit: [...]</div>
+            <div class="same-story-flag" onclick="jumpTo('q-res-[company]-1')"><span class="ssf-icon">&#128257;</span> Same story as &ldquo;[resume story question]&rdquo; &ndash; told in full there.</div>
+            <div class="prose"><p>[One or two sentences: the angle of that story that answers THIS JD line, in this JD's own vocabulary.]</p></div>
+            <div class="probe-box">
+              <div class="probe-label">If they keep probing</div>
+              <ul><li><strong>&ldquo;[Follow-up specific to this JD line]&rdquo;</strong> <span class="probe-tag draft">Your judgment</span><br><span class="probe-cue">&ldquo;[Honest answer.]&rdquo;</span></li></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      VARIANT C: GAP (nothing honest exists; Gap Language Pattern, never padded):
+      <div class="resume-bullet-group">
+        <div class="jd-req"><span class="jd-tag required">Required</span>&ldquo;[Exact JD phrase]&rdquo;</div>
+        <div class="q-block" id="q-jd-3">
+          <div class="q-header" onclick="toggleQ(this)">
+            <span class="q-num">J3</span>
+            <div class="q-header-text"><span class="q-title-text">[Question that exposes the gap]</span><div class="study-cue">[The honest gap plus the bridge]</div></div>
+            <span class="q-chevron">&#9660;</span>
+          </div>
+          <div class="q-body">
+            <div class="note note-red">Honest gap. Say it plainly, then bridge. Don't bluff.</div>
+            <div class="story-head"><span>Gap answer</span></div>
+            <div class="prose"><p>[Understanding, then the gap, then the bridge to the closest real thing.]</p></div>
+          </div>
+        </div>
+      </div>
+      -->
+    </div>
+  </div>
+
+  <div class="section-block" id="sec-jd-preferred">
+    <div class="section-header" onclick="toggleSection(this)"><span class="section-num">02</span><span class="section-title">Preferred Qualifications</span><span class="section-chevron">&#9660;</span></div>
+    <div class="section-body">
+      <!-- Same three variants as above, tag: <span class="jd-tag preferred">Preferred</span>, ids q-jd-p1... -->
+    </div>
+  </div>
+
+  <div class="section-block" id="sec-jd-resp">
+    <div class="section-header" onclick="toggleSection(this)"><span class="section-num">03</span><span class="section-title">Responsibilities</span><span class="section-chevron">&#9660;</span></div>
+    <div class="section-body">
+      <!-- Same three variants as above, tag: <span class="jd-tag resp">Responsibility</span>, ids q-jd-r1... -->
+    </div>
+  </div>
+
+</div><!-- /tab-jd -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+  TAB: EXTRA STORIES — stories that do not live in the resume or the
+  JD lines, kept here for extra context and in case they are needed.
+  Fixed group order: Core stories (ONLY when no resume was submitted,
+  otherwise delete that group), Focus areas they named [slot], In your
+  intro (not covered elsewhere), Technical work not covered elsewhere,
+  Behavioral (by type of question: strength, weakness, priorities,
+  ambiguity, influence, customer, results, hiring, learning, failure,
+  outside of work). Same Story block shell, probe-box, culture note, and
+  alternate-story toggle as Resume Stories.
+════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-extra">
+
+  <!-- GROUP: Core stories. ONLY when no resume was submitted: the
+       core stories that would have lived in Resume Stories live here
+       instead. Delete this whole group when a resume exists. -->
+  <div class="section-block open" id="sec-extra-core">
+    <div class="section-header" onclick="toggleSection(this)"><span class="section-num">00</span><span class="section-title">Core Stories (No Resume Submitted)</span><span class="section-chevron">&#9660;</span></div>
+    <div class="section-body">
+      <!-- Story blocks, same shell as Resume Stories, ids q-x-core-1... -->
+    </div>
+  </div>
+
+  <!-- GROUP: Focus areas they named [slot] — only if the Focus Card
+       named specific themes. Delete this group if not applicable. -->
+  <div class="section-block open" id="sec-extra-focus">
+    <div class="section-header" onclick="toggleSection(this)"><span class="section-num">01</span><span class="section-title">Focus Areas They Named</span><span class="section-chevron">&#9660;</span></div>
+    <div class="section-body">
+      <!-- Story blocks, same shell as Resume Stories, ids q-x-focus-1, q-x-focus-2... -->
+    </div>
+  </div>
+
+  <!-- GROUP: In your intro, not on your resume — any story said in
+       the Pitch subtab that isn't already covered by a Resume Stories
+       block gets one here. -->
+  <div class="section-block" id="sec-extra-intro">
+    <div class="section-header" onclick="toggleSection(this)"><span class="section-num">02</span><span class="section-title">In Your Intro, Not Covered Elsewhere</span><span class="section-chevron">&#9660;</span></div>
+    <div class="section-body">
+      <!-- Story blocks, ids q-x-intro-1... -->
+    </div>
+  </div>
+
+  <!-- GROUP: Technical work, not on your resume -->
+  <div class="section-block" id="sec-extra-tech">
+    <div class="section-header" onclick="toggleSection(this)"><span class="section-num">03</span><span class="section-title">Technical Work, Not Covered Elsewhere</span><span class="section-chevron">&#9660;</span></div>
+    <div class="section-body">
+      <!-- Story blocks, ids q-x-tech-1... -->
+    </div>
+  </div>
+
+  <!-- GROUP: Behavioral, by type of question. Fixed order: strength,
+       weakness, priorities, ambiguity, influence, customer, results,
+       hiring, learning, failure, outside of work. -->
+  <div class="section-block" id="sec-extra-behavioral">
+    <div class="section-header" onclick="toggleSection(this)"><span class="section-num">04</span><span class="section-title">Behavioral, By Type</span><span class="section-chevron">&#9660;</span></div>
+    <div class="section-body">
+      <div class="section-intro">Fixed order: strength &middot; weakness &middot; competing priorities &middot; ambiguous environment &middot; influence without authority &middot; customer/stakeholder &middot; results/metrics &middot; hiring/interviewing &middot; learning something new &middot; a real failure &middot; outside of work.</div>
+      <!-- q-x-strength, q-x-weakness, q-x-priorities, q-x-ambiguity, q-x-influence,
+           q-x-customer, q-x-results, q-x-hiring, q-x-learning, q-x-failure,
+           q-x-outside — same Story block shell, including probe-box and
+           fallback-toggle. -->
+    </div>
+  </div>
+
+</div><!-- /tab-extra -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+  TAB: TECHNICAL KNOWLEDGE — groups built from the JD. Typical groups:
+  Standards and approach for this role [slot: domain standards], Test
+  and verification depth, Scenario questions (troubleshoot it / design
+  it), Fit and logistics (why us, your moves, domain background,
+  regulators, tools, AI use, relocation), Fundamentals (collapsed,
+  only if they go textbook). Mostly Knowledge blocks (Direct answer /
+  Deeper dive / Follow-ups); a scenario group can use Story blocks
+  where a real example is the best answer.
+════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-tech">
+
+  <!-- OPEN-ENDED QUESTIONS BLOCK — required on every card, always first
+       in this tab (README: Open-Ended Questions). Knowledge-block shell.
+       Replace the bracketed sample clarifying questions with ones
+       written for THIS company's actual domain. -->
+  <div class="q-block" id="q-tech-open">
+    <div class="q-header" onclick="toggleQ(this)">
+      <span class="q-num">OE</span>
+      <div class="q-header-text">
+        <span class="q-title-text">Open-ended question: close the gap before answering <span class="q-badge gold">Every card</span></span>
+        <div class="study-cue">Ask, frame, outline, stop. Clarify first, then hand it back.</div>
+      </div>
+      <span class="q-chevron">&#9660;</span>
+    </div>
+    <div class="q-body">
+      <div class="note note-dim">Use when: any design, hypothetical, theoretical, or broad behavioral question with no clear scope.</div>
+      <div class="story-head"><span>Direct answer</span></div>
+      <div class="prose">
+        <p><strong>1. Ask first.</strong> 2 to 4 clarifying questions: users, primary goal, constraints, what success looks like. For a broad behavioral question, one scope question: &ldquo;Do you want a specific example or my general approach?&rdquo;</p>
+        <p><strong>2. Frame in one sentence.</strong> Restate the problem and the worst outcome before solving it.</p>
+        <p><strong>3. Outline only.</strong> 3 or 4 points, one line each, 60 to 90 seconds.</p>
+        <p><strong>4. Stop and hand it back.</strong> &ldquo;Where do you want me to go deeper?&rdquo;</p>
+        <p><strong>5. Keep detail in reserve.</strong> Their follow-ups show what they care about.</p>
+        <div class="star-label">Sample clarifying questions for [COMPANY]'s domain</div>
+        <ul>
+          <li>&ldquo;[Who are the users or operators of this system?]&rdquo;</li>
+          <li>&ldquo;[What is the primary goal, and what does success look like?]&rdquo;</li>
+          <li>&ldquo;[What constraints do I have: safety, cost, schedule, regulatory?]&rdquo;</li>
+          <li>&ldquo;[What is the worst failure outcome we need to design against?]&rdquo;</li>
+        </ul>
+        <div class="star-label">Answer length guide</div>
+        <p>Behavioral STAR: 60 to 90 seconds. Design outline: 90 seconds after clarifying. Theoretical: 30 to 45 seconds (answer, one reason, one example, stop).</p>
+        <div class="star-label">Stop line</div>
+        <p>&ldquo;Where do you want me to go deeper?&rdquo;</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toc">
+    <!-- One toc-link per grp below, same order:
+    <span class="toc-link" onclick="jumpTo('g-[group]')">[Group label]</span>
+    -->
+  </div>
+
+  <!-- GROUP TEMPLATE (repeat per JD requirement area):
+  <div class="grp" id="g-[group]">
+    <div class="grp-title">[Group label, e.g. "Test & verification depth"]</div>
+    <div class="grp-quote">&ldquo;[JD phrase(s) this group answers, verbatim]&rdquo;</div>
+
+    KNOWLEDGE BLOCK TEMPLATE (repeat per question in this group, ids q-tech-1, q-tech-2...):
+    <div class="q-block" id="q-tech-1">
+      <div class="q-header" onclick="toggleQ(this)">
+        <span class="q-num">T1</span>
+        <div class="q-header-text">
+          <span class="q-title-text">[Question, phrased how an interviewer would actually ask it]</span>
+          <div class="study-cue">[One-line memory hook]</div>
+        </div>
+        <span class="q-chevron">&#9660;</span>
+      </div>
+      <div class="q-body">
+        <div class="note note-dim">Use when: &ldquo;[JD phrase(s) that trigger this question]&rdquo;</div>
+        <div class="story-head"><span>Direct answer</span></div>
+        <div class="prose"><p>[2-5 sentences, plain-language first.]</p></div>
+        <div class="prose" style="margin-top:10px">
+          <div class="star-label">Deeper Dive (only if asked)</div>
+          <p><strong>Where I've used it:</strong> [...]</p>
+          <p><strong>How it goes wrong:</strong> [...]</p>
+          <p><strong>What I'd check in their domain:</strong> [...]</p>
+        </div>
+        <div class="probe-box">
+          <div class="probe-label">Follow-ups</div>
+          <ul>
+            <li><strong>&ldquo;[Likely follow-up]&rdquo;</strong> <span class="probe-tag draft">Your judgment</span><br><span class="probe-cue">&ldquo;[Honest answer.]&rdquo;</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  -->
+
+  <!-- GAP KNOWLEDGE BLOCK (honest gap, no deeper-dive bluffing). note-red,
+       story-head "Gap answer":
+  <div class="q-block" id="q-tech-gap1">
+    <div class="q-header" onclick="toggleQ(this)">
+      <span class="q-num">T9</span>
+      <div class="q-header-text"><span class="q-title-text">[Question that exposes a real gap]</span><div class="study-cue">[Memory hook: the honest gap + the bridge]</div></div>
+      <span class="q-chevron">&#9660;</span>
+    </div>
+    <div class="q-body">
+      <div class="note note-red">Honest gap. Say it plainly, then bridge. Don't bluff terms that can't be defended.</div>
+      <div class="story-head"><span>Gap answer</span></div>
+      <div class="prose"><p>[Gap Language Pattern: understanding, then the gap, then the bridge.]</p></div>
+    </div>
+  </div>
+  -->
+
+  <!-- FUNDAMENTALS GROUP — collapsed by default (section-block, not
+       open), only built out if the interviewer is likely to go
+       textbook per the Interviewer Card.
+  <div class="grp" id="g-fundamentals">
+    <div class="section-block" id="sec-fundamentals">
+      <div class="section-header" onclick="toggleSection(this)"><span class="section-num">FN</span><span class="section-title">Fundamentals (If They Go Textbook)</span><span class="section-chevron">&#9660;</span></div>
+      <div class="section-body">
+        Knowledge blocks, ids q-tech-fund-1...
+      </div>
+    </div>
+  </div>
+  -->
+
+</div><!-- /tab-tech -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+  TAB: VALUES — optional [slot]. Only build this tab, and uncomment its
+  nav button above, when the target company has real, named, publicly
+  documented values, leadership principles, or engineering practices
+  (see README's Company Values Alignment and the Values Tab). One card
+  per value: what it means to you, why it matters there, one short
+  real example, tied to the stories that prove it.
+════════════════════════════════════════════════════════════════════════ -->
+<!--
+<div class="tab-panel" id="tab-values">
+  <div class="section-block open" id="sec-values">
+    <div class="section-header" onclick="toggleSection(this)"><span class="section-num">V</span><span class="section-title">[Company] Values: Which Story to Tell</span><span class="section-chevron">&#9660;</span></div>
+    <div class="section-body">
+      <div class="lp-help">Tap a value name for what it means to you, why it matters here, and a quick example. Tap a story chip to jump to it. <b>alt</b> opens the alternate story. Never say the value's name out loud in the actual answer; the story shows it.</div>
+      <div class="lp-grid" id="lp-map">
+        LP-ROW TEMPLATE (repeat per published value, 2-5 total per README guidance):
+        <div class="lp-row" id="lpdef-0">
+          <span class="lp-name" onclick="this.parentElement.classList.toggle('open')">[Value Name]<span class="lp-caret">&#9656;</span></span>
+          <span class="lp-links">
+            <span class="lp-link" onclick="jumpTo('q-res-1')" title="[Story label]"><b>R1</b> [Story label]</span>
+            <span class="lp-link alt" onclick="jumpAlt('q-res-1')" title="Alternate story"><b>alt</b> [Alt story label]</span>
+          </span>
+          <div class="lp-def">
+            <p><b>What it means to me:</b> &ldquo;[Your own framing, not a textbook definition.]&rdquo;</p>
+            <p><b>Why it matters here:</b> [Tie to this specific JD/company.]</p>
+            <p><b>Quick example:</b> &ldquo;[Short, real example, for a "what does X mean to you?" question.]&rdquo;</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+-->
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+  TAB: INTEL — company, product, team, interviewer, recent news,
+  competitors. 8-10+ cards, researched live at build time.
+════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-intel">
+  <div class="section-block open" id="sec-intel">
+    <div class="section-header" onclick="toggleSection(this)"><span class="section-num">06</span><span class="section-title">[Company] / [Program] Intel</span><span class="section-chevron">&#9660;</span></div>
+    <div class="section-body">
+      <div class="intel-grid">
+
+        <div class="intel-card" id="intel-news" style="grid-column:1/-1;border-color:rgba(255,200,87,0.35);background:rgba(255,200,87,0.05)">
+          <div class="intel-card-title" style="color:var(--gold)">Recent News &amp; Talking Points (researched [DATE])</div>
+          <div class="prose"><p>[2-4 real, dated items from live research, each with a one-line "why mention it" note, and a source line.]</p></div>
+        </div>
+
+        <div class="intel-card" id="intel-team" style="grid-column:1/-1">
+          <div class="intel-card-title">Team &amp; Who You'd Integrate With</div>
+          <div class="prose"><p>[Named interviewers/managers with real background where known. Shared programs/employers/locations noted as real rapport, never manufactured.]</p></div>
+        </div>
+
+        <div class="intel-card" id="intel-org"><div class="intel-card-title">Org Structure</div><div class="prose"><p>[Parent company, division, program hierarchy.]</p></div></div>
+
+        <!-- Commercial/startup build: this card's product description stays
+             in one plain, unclassified sentence per README's Sector-Coded
+             Language Rule, so "what was the system?" never sounds evasive. -->
+        <div class="intel-card" id="intel-product"><div class="intel-card-title">What [Program / Product] Actually Is</div><div class="prose"><p>[Real facts from documentation.]</p></div></div>
+
+        <div class="intel-card" id="intel-customer"><div class="intel-card-title">Customer / User Relationship</div><div class="prose"><p>[...]</p></div></div>
+        <div class="intel-card" id="intel-scope"><div class="intel-card-title">Day-to-Day Scope</div><div class="prose"><p>[...]</p></div></div>
+        <div class="intel-card" id="intel-strategy"><div class="intel-card-title">Strategic Context</div><div class="prose"><p>[...]</p></div></div>
+
+        <div class="intel-card" id="intel-competitors"><div class="intel-card-title">Competitors</div><div class="prose"><p>[Who they compete with, and one line on how this role/program fits into that competitive picture.]</p></div></div>
+
+        <div class="intel-card" id="intel-diff" style="grid-column:1/-1">
+          <div class="intel-card-title">Core Differentiators for This Role</div>
+          <div class="prose"><p><strong>1.</strong> [...]</p><p><strong>2.</strong> [...]</p><p><strong>3.</strong> [...]</p><p><strong>4.</strong> [...]</p><p><strong>5.</strong> [...]</p></div>
+        </div>
+
+        <div class="intel-card" id="intel-role"><div class="intel-card-title">What This Role Actually Means</div><div class="prose"><p>[IC vs manager, authority scope.]</p></div></div>
+        <div class="intel-card" id="intel-connect"><div class="intel-card-title">How the Background Connects</div><div class="prose"><p>&ldquo;[The statement that closes the gap.]&rdquo;</p></div></div>
+
+        <div class="intel-card" id="intel-concepts" style="grid-column:1/-1;border-color:rgba(255,200,87,0.35)">
+          <div class="intel-card-title" style="color:var(--gold)">Key Concepts: Full Reference</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:10px">
+            <!-- 6-10 panels, same term-tile pattern as Overview's Resume/JD Map, each pointing at a real ANCHOR_MAP id:
+            <div class="term-tile" onclick="jumpTo('q-tech-1')"><span style="color:var(--gold);font-weight:600">[CONCEPT]</span><br><span style="color:var(--dim)">[Meaning]. [Application or honest gap note.]</span><span class="term-jump-hint">&rarr; [label]</span></div>
+            -->
+          </div>
+        </div>
+
+        <div class="intel-card" id="intel-position" style="grid-column:1/-1">
+          <div class="intel-card-title">Positioning Statement</div>
+          <div class="prose"><p>&ldquo;[3-4 sentences. Why applied, why it's not a stretch. "Not a pivot, a direct extension."]&rdquo;</p></div>
+          <!-- Only if real documented values exist (see README):
+          <p><span style="color:var(--dim);font-size:0.8rem">Framed toward [Company]'s values <strong>[Value A]</strong> and <strong>[Value B]</strong>.</span></p>
+          -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-intel -->
+
+</div><!-- /.main -->
+
+
+<div id="search-results-bar"></div>
+<div id="search-bar">
+  <div class="search-row">
+    <button id="back-btn" class="back-btn" onclick="goBack()">&larr; Back</button>
+    <select id="jump-select" class="jump-select" onchange="if(this.value){jumpTo(this.value);this.selectedIndex=0;}">
+      <option value="">Jump to&hellip;</option>
+      <!-- One <optgroup> per tab/subtab, one <option> per block/card/section id, same ids as ANCHOR_MAP. Rebuild this whenever a block is added. -->
+    </select>
+    <input id="search-input" class="search-input" type="text" placeholder="Press / to search: question, keyword, acronym..." autocomplete="off" />
+    <span id="search-clear" class="search-clear" onclick="closeSearch()">&#10005;</span>
+  </div>
+</div>
+
+
+<script>
+/*
+  ══ STEP 1: SUBTABS CONFIG ════════════════════════════════════════════
+  Overview, Resume Stories [omitted if no resume], JD Question Stories,
+  Extra Stories, Technical Knowledge, Values [optional], Intel are the
+  fixed tabs. Overview always has these 5
+  subtabs. The rest have no subtabs — a single flat/grouped scroll is
+  what makes the card fast. Uncomment the 'values' line only when the
+  Values tab is built.
+*/
+var SUBTABS = {
+  'overview': [
+    { id: 'summary',  label: '&#128203; Summary' },
+    { id: 'pitch',    label: '&#128483; Pitch' },
+    { id: 'ask',      label: '&#10067; Ask Them' },
+    { id: 'tips',     label: 'Interview Tips' },
+    { id: 'closing',  label: '&#127919; Closing' },
+  ],
+  'resume': [],
+  'jd': [],
+  'extra': [],
+  'tech': [],
+  // 'values': [],
+  'intel': [],
+};
+
+/*
+  ══ STEP 2: ANCHOR MAP ════════════════════════════════════════════════
+  Map EVERY q-block/card/section id to [main-tab, subtab]. Tabs with no
+  subtabs use '' as the subtab value. Add an entry the moment a block
+  is created, and confirm every id in here still exists before
+  presenting the file (Quality Checks, README).
+*/
+var ANCHOR_MAP = {
+  'sub-overview-summary': ['overview','summary'],
+  'card-focus': ['overview','summary'], 'card-resume-map': ['overview','summary'],
+  'card-stage': ['overview','summary'], 'card-interviewer': ['overview','summary'],
+  'card-jdmap': ['overview','summary'], 'card-recover': ['overview','summary'],
+  'card-comp': ['overview','summary'],
+  'sec-why-them': ['overview','pitch'], 'sec-why-leaving': ['overview','pitch'],
+  'sec-pitch': ['overview','pitch'], 'sec-walkthrough': ['overview','pitch'],
+  'sec-ask-them': ['overview','ask'],
+  'sec-tips': ['overview','tips'],
+  'sec-closing': ['overview','closing'],
+  'sec-extra-core': ['extra',''], 'sec-extra-focus': ['extra',''], 'sec-extra-intro': ['extra',''],
+  'sec-jd-required': ['jd',''], 'sec-jd-preferred': ['jd',''], 'sec-jd-resp': ['jd',''],
+  'sec-extra-tech': ['extra',''], 'sec-extra-behavioral': ['extra',''],
+  'sec-intel': ['intel',''],
+  'intel-news': ['intel',''], 'intel-team': ['intel',''], 'intel-org': ['intel',''],
+  'intel-product': ['intel',''], 'intel-customer': ['intel',''], 'intel-scope': ['intel',''],
+  'intel-strategy': ['intel',''], 'intel-competitors': ['intel',''], 'intel-diff': ['intel',''],
+  'intel-role': ['intel',''], 'intel-connect': ['intel',''], 'intel-concepts': ['intel',''],
+  'intel-position': ['intel',''],
+  'q-tech-open': ['tech',''],
+  /* ADD EVERY story/knowledge block, resume company section, grp, and
+     lp-row id you create, e.g.:
+  'sec-resume-companyA': ['resume',''], 'q-res-companyA-1': ['resume',''],
+  'g-standards': ['tech',''], 'q-tech-1': ['tech',''],
+  'q-jd-1': ['jd',''], 'q-x-strength': ['extra',''], 'lpdef-0': ['values',''],
+  'ask-recruiter-1': ['overview','ask'],
+  */
+};
+
+/*
+  ══ STEP 3: SEARCH INDEX ══════════════════════════════════════════════
+  Minimum 72 entries for a panel-level card. Each entry needs 15-25
+  tags: exact term, acronym (both forms), full phrase, synonym,
+  conversational phrasing, partial word, question form, number/name.
+  `text` is filled automatically at load time from each element's own
+  innerText (see indexText below) so the engine can also match on full
+  sentence content and show a real snippet, not just hand-written tags.
+
+  These entries never change, copy them to every card:
+*/
+var SEARCH_INDEX = [
+  { label: 'Elevator Pitch', sublabel: 'Past present future', id: 'sec-pitch', section: 'Section',
+    tags: ['pitch','opening','tell me about yourself','intro','background','past present future','walk me through your background','career arc','about yourself','elevator pitch'] },
+  { label: 'Why This Role', sublabel: 'Why them', id: 'sec-why-them', section: 'Section',
+    tags: ['why them','why us','why this company','why here','why interested','why this role'] },
+  { label: "Why I'm Leaving", sublabel: 'Forward-looking framing', id: 'sec-why-leaving', section: 'Section',
+    tags: ['why leaving','why leave','current role','why looking','why now','why move'] },
+  { label: 'Questions to Ask Them', sublabel: 'Recruiter / HM / Peer tiers', id: 'sec-ask-them', section: 'Section',
+    tags: ['questions to ask','ask them','do you have questions','what should i ask','recruiter questions','hiring manager questions','peer questions'] },
+  { label: 'Closing the Call', sublabel: 'Last 60 seconds script', id: 'sec-closing', section: 'Section',
+    tags: ['closing','close','last 60 seconds','wrap up','next steps','timeline','end of interview','hard close','before we end'] },
+  { label: 'Resume Map', sublabel: 'Every bullet, defended', id: 'card-resume-map', section: 'Section',
+    tags: ['resume map','bullet map','every bullet','what did i submit','resume bullets'] },
+  { label: 'JD Map', sublabel: 'What you are actually being scored on', id: 'card-jdmap', section: 'Section',
+    tags: ['jd map','scorecard','what are they scoring','requirements map','coverage'] },
+  { label: 'If You Lose Your Place', sublabel: 'Recovery lines', id: 'card-recover', section: 'Section',
+    tags: ['lost','blank','stuck','freeze','recover','what do i say','lose my place'] },
+  { label: 'Open-Ended Question Approach', sublabel: 'Ask, frame, outline, stop', id: 'q-tech-open', section: 'Knowledge',
+    tags: ['open ended','open-ended','design question','hypothetical','clarify','clarifying questions','requirements','ask first','outline','stop','scope','how would you design','tell me about yourself','how do you handle'] },
+  { label: 'Pay Range & Comp Script', sublabel: 'Fit tier / leverage points / verbatim ask', id: 'card-comp', section: 'Section',
+    tags: ['comp','salary','compensation','how much','pay','target','base','what are you looking for','money','range','expectation','logistics','join instructions'] },
+  /* ADD ALL RESUME-STORY, MORE-STORY, TECHNICAL-KNOWLEDGE, VALUES, AND
+     JD-DERIVED ENTRIES. One entry per JD requirement, tool,
+     methodology, acronym, story, question, and Intel card. Add an
+     entry for the fallback content too when it covers meaningfully
+     different ground. */
+];
+
+var SYN = {
+  /* term -> related terms a plain-language question might use instead.
+     CUSTOMIZE per role/domain, e.g.:
+  'boss':['leadership','senior leadership'], 'manager':['leadership','management'],
+  'money':['comp','salary','budget'], 'pay':['comp','salary'],
+  'deadline':['schedule','timeline'], 'fast':['speed','deliver results'],
+  */
+};
+var SECTION_COLORS = { 'Story': '#3ecf8e', 'JD Story': '#ffc857', 'Knowledge': '#9d96ff', 'Fundamentals': '#ffc857', 'Behavioral': '#ff9f9f', 'Intel': '#9d96ff', 'Section': '#a0a0b8' };
+
+/* ── NAV + SEARCH ENGINE: do not modify ──────────────────────────── */
+
+var currentMain = 'overview', currentSub = {};
+var navStack = [];       // multi-step back history: array of {mainId, subId, scrollY}
+var openBlock = null;    // the single currently-open story/knowledge block, enforced card-wide
+
+function setOffsets() {
+  var h = document.querySelector('.site-header'), n = document.getElementById('main-tabs'), s = document.getElementById('subtab-nav');
+  var hh = h ? h.offsetHeight : 70, nh = n ? n.offsetHeight : 44, sh = (s && s.classList.contains('visible')) ? s.offsetHeight : 0;
+  var r = document.documentElement.style;
+  r.setProperty('--hdr', hh + 'px'); r.setProperty('--nav', (hh + nh) + 'px'); r.setProperty('--sub', (hh + nh + sh) + 'px');
+}
+window.addEventListener('resize', setOffsets);
+
+function buildSubtabs(mainId) {
+  var nav = document.getElementById('subtab-nav'), tabs = SUBTABS[mainId] || [];
+  if (tabs.length <= 1) { nav.innerHTML = ''; nav.classList.remove('visible'); setOffsets(); return; }
+  nav.classList.add('visible');
+  nav.innerHTML = tabs.map(function(t, i) {
+    return '<div class="subtab-btn' + (i === 0 ? ' active' : '') + '" onclick="switchSubTab(\'' + mainId + '\',\'' + t.id + '\')">' + t.label + '</div>';
+  }).join('');
+  setOffsets();
+}
+function showMain(id) {
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  var pe = document.getElementById('tab-' + id), be = document.querySelector('[data-tab="' + id + '"]');
+  if (pe) pe.classList.add('active'); if (be) be.classList.add('active');
+  currentMain = id; buildSubtabs(id);
+}
+function switchMainTab(id) {
+  // Manual tab click: a fresh navigation, not a "back"-able jump. Clears the stack.
+  navStack = []; var b = document.getElementById('back-btn'); if (b) b.classList.remove('visible');
+  showMain(id);
+  var subs = SUBTABS[id] || [];
+  if (subs.length) activateSubPanel(id, currentSub[id] || subs[0].id);
+  closeSearch(); window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function activateSubPanel(mainId, subId) {
+  document.querySelectorAll('#tab-' + mainId + ' .subtab-panel').forEach(function(p) { p.classList.remove('active'); });
+  var t = document.getElementById('sub-' + mainId + '-' + subId); if (t) t.classList.add('active');
+  currentSub[mainId] = subId;
+  var tabs = SUBTABS[mainId] || [];
+  document.querySelectorAll('.subtab-btn').forEach(function(b, i) { b.classList.toggle('active', !!(tabs[i] && tabs[i].id === subId)); });
+}
+function switchSubTab(mainId, subId) { activateSubPanel(mainId, subId); closeSearch(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function toggleSection(h) { h.parentElement.classList.toggle('open'); }
+
+/* toggleQ: enforces "only one block open at a time" across the WHOLE
+   card, not just within one section/tab. Opening any story/knowledge
+   block closes whichever one was previously open, anywhere. */
+function toggleQ(h) {
+  var blk = h.parentElement;
+  var wasOpen = blk.classList.contains('open');
+  if (openBlock && openBlock !== blk) { openBlock.classList.remove('open'); }
+  if (wasOpen) { blk.classList.remove('open'); openBlock = null; }
+  else { blk.classList.add('open'); openBlock = blk; }
+}
+function toggleFallback(btn) { btn.classList.toggle('open'); var c = btn.nextElementSibling; if (c) c.classList.toggle('visible'); }
+
+function saveHistory() {
+  var first = (SUBTABS[currentMain] && SUBTABS[currentMain][0]) ? SUBTABS[currentMain][0].id : '';
+  navStack.push({ mainId: currentMain, subId: currentSub[currentMain] || first, scrollY: window.scrollY });
+  var b = document.getElementById('back-btn'); if (b) b.classList.add('visible');
+}
+/* goBack: multi-step. Each call pops one step off the real navigation
+   history and returns to the exact block and scroll position that
+   was open at that step, instead of a single fixed "home" spot. Wired
+   to both the Back button and the Backspace key. */
+function goBack() {
+  if (!navStack.length) return;
+  var h = navStack.pop();
+  if (!navStack.length) { var b = document.getElementById('back-btn'); if (b) b.classList.remove('visible'); }
+  showMainForBack(h.mainId); if (h.subId) activateSubPanel(h.mainId, h.subId);
+  setTimeout(function() { window.scrollTo({ top: h.scrollY, behavior: 'smooth' }); }, 80);
+}
+/* showMainForBack: same as showMain, but never clears navStack (plain
+   showMain is only ever called directly by switchMainTab's manual-click path). */
+function showMainForBack(id) { showMain(id); }
+
+function _jumpToCore(id) {
+  var target = document.getElementById(id); if (!target) return;
+  var route = ANCHOR_MAP[id];
+  if (route) { if (route[0] !== currentMain) showMainForBack(route[0]); if (route[1]) activateSubPanel(route[0], route[1]); }
+  var el = target;
+  while (el) { if (el.classList && el.classList.contains('section-block')) el.classList.add('open'); el = el.parentElement; }
+  if (target.classList.contains('q-block')) { if (openBlock && openBlock !== target) openBlock.classList.remove('open'); target.classList.add('open'); openBlock = target; }
+  if (target.classList.contains('lp-row')) target.classList.add('open');
+  setTimeout(function() { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 150);
+  closeSearch();
+}
+function jumpTo(id) { saveHistory(); _jumpToCore(id); }
+
+/* jumpAlt: used by the Values tab's "alt" chips and the Same-Story
+   Flag. Jumps to a q-block AND opens its Alternate story toggle
+   automatically. */
+function jumpAlt(id) {
+  jumpTo(id);
+  var q = document.getElementById(id); if (!q) return;
+  var t = q.querySelector('.fallback-toggle'), c = q.querySelector('.fallback-content');
+  if (t && c && !c.classList.contains('visible')) { t.classList.add('open'); c.classList.add('visible'); }
+  setTimeout(function() { if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250);
+}
+
+document.querySelectorAll('a[href^="#"]').forEach(function(link) {
+  link.addEventListener('click', function(e) { e.preventDefault(); jumpTo(this.getAttribute('href').slice(1)); });
+});
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() { navStack = []; var b = document.getElementById('back-btn'); if (b) b.classList.remove('visible'); });
+});
+
+/* Full-text search: stopword/filler removal, light stemming, a
+   per-role SYN table for conversational synonyms, and a real snippet
+   pulled from the block's own text so results show why they matched,
+   not just a hand-written sublabel. */
+function stem(t) { return t.replace(/(ing|ed|es|s)$/,''); }
+function indexText() {
+  SEARCH_INDEX.forEach(function(e) {
+    var el = document.getElementById(e.id);
+    e.text = el ? (el.innerText || el.textContent || '').toLowerCase() : '';
+  });
+}
+function score(entry, q) {
+  var raw = q.toLowerCase().trim();
+  var STOPW = ['what','if','they','how','do','you','the','a','an','to','of','and','or','in','on','for','me','my','your','about','did','does','is','are','was','when','why','tell','time','with','it','that','this','would'];
+  var terms = raw.split(/\s+/).filter(function(t) { return t.length > 1 && STOPW.indexOf(t) < 0; });
+  if (!terms.length) terms = raw.split(/\s+/);
+  var s = 0, hits = 0;
+  terms.forEach(function(t) {
+    var variants = [t, stem(t)].concat(SYN[t] || SYN[stem(t)] || []);
+    var best = 0;
+    variants.forEach(function(v) {
+      var sc = 0;
+      if (entry.tags.some(function(tag) { return tag === v; })) sc = 30;
+      else if (entry.tags.some(function(tag) { return tag.indexOf(v) === 0; })) sc = 20;
+      else if (entry.tags.some(function(tag) { return tag.indexOf(v) > -1; })) sc = 12;
+      else if (entry.label.toLowerCase().indexOf(v) > -1) sc = 10;
+      else if (entry.text && entry.text.indexOf(v) > -1) sc = 5;
+      if (v !== t) sc = Math.round(sc * 0.7);
+      if (sc > best) best = sc;
+    });
+    if (best) hits++;
+    s += best;
+  });
+  if (terms.length > 1 && hits === terms.length) s += 15;
+  if (raw.length > 3) {
+    if (entry.label.toLowerCase().indexOf(raw) > -1) s += 20;
+    if (entry.tags.some(function(tag) { return tag.indexOf(raw) > -1; })) s += 15;
+    if (entry.text && entry.text.indexOf(raw) > -1) s += 12;
+  }
+  return s;
+}
+function snippet(entry, q) {
+  if (!entry.text) return entry.sublabel;
+  var terms = q.toLowerCase().trim().split(/\s+/);
+  var pos = entry.text.indexOf(q.toLowerCase().trim());
+  for (var i = 0; pos < 0 && i < terms.length; i++) if (terms[i].length > 2) pos = entry.text.indexOf(stem(terms[i]));
+  if (pos < 0) return entry.sublabel;
+  var st = Math.max(0, pos - 40), s = entry.text.substr(st, 120).replace(/\s+/g, ' ');
+  return (st > 0 ? '…' : '') + s + '…';
+}
+
+var searchInput = document.getElementById('search-input');
+var searchResults = document.getElementById('search-results-bar');
+var searchClear = document.getElementById('search-clear');
+
+function runSearch(q) {
+  if (!q || q.trim().length < 2) { searchResults.classList.remove('visible'); searchClear.classList.remove('visible'); return; }
+  searchClear.classList.add('visible');
+  var scored = SEARCH_INDEX.map(function(e) { var c = {}; for (var k in e) c[k] = e[k]; c.s = score(e, q); return c; })
+    .filter(function(e) { return e.s > 0; }).sort(function(a, b) { return b.s - a.s; }).slice(0, 8);
+  if (!scored.length) { searchResults.innerHTML = '<div class="search-no-results">No matches. Try different keywords.</div>'; searchResults.classList.add('visible'); return; }
+  searchResults.innerHTML = scored.map(function(e) {
+    return '<div class="search-result" onclick="jumpTo(\'' + e.id + '\')"><span class="sr-tag" style="color:' + (SECTION_COLORS[e.section] || '#a0a0b8') + '">' + e.section + '</span><span class="sr-label">' + e.label + '</span><span class="sr-sub">' + snippet(e, q) + '</span></div>';
+  }).join('');
+  searchResults.classList.add('visible');
+}
+function closeSearch() { searchResults.classList.remove('visible'); searchInput.value = ''; searchClear.classList.remove('visible'); searchInput.blur(); }
+searchInput.addEventListener('input', function() { runSearch(searchInput.value); });
+searchInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSearch();
+  if (e.key === 'Enter') { var f = searchResults.querySelector('.search-result'); if (f) f.click(); }
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === '/' && document.activeElement !== searchInput) { e.preventDefault(); searchInput.focus(); }
+  if (e.key === 'Escape') closeSearch();
+  // Backspace steps back through real navigation history, same as the
+  // Back button, as long as focus isn't in a text field (where
+  // Backspace needs to behave normally).
+  if (e.key === 'Backspace') {
+    var tag = document.activeElement && document.activeElement.tagName;
+    var isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || (document.activeElement && document.activeElement.isContentEditable);
+    if (!isTyping && navStack.length) { e.preventDefault(); goBack(); }
+  }
+});
+document.addEventListener('click', function(e) { if (!e.target.closest('#search-bar') && !e.target.closest('#search-results-bar')) searchResults.classList.remove('visible'); });
+
+buildSubtabs('overview'); setOffsets(); indexText();
+</script>
+</body>
+</html>
